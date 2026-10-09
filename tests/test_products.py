@@ -5,6 +5,7 @@ def test_create_product_success(client: TestClient):
     payload = {
         "sku": "shoes-101",
         "name": "Running Shoes",
+        "unit_price_paise": 15000,
         "stock_quantity": 10,
         "low_stock_threshold": 3,
     }
@@ -15,6 +16,7 @@ def test_create_product_success(client: TestClient):
     data = response.json()
     assert data["sku"] == "SHOES-101"
     assert data["name"] == "Running Shoes"
+    assert data["unit_price_paise"] == 15000
     assert data["stock_quantity"] == 10
     assert data["low_stock_threshold"] == 3
     assert "id" in data
@@ -38,6 +40,7 @@ def test_create_duplicate_sku(client: TestClient):
     payload = {
         "sku": "DUPLICATE-SKU",
         "name": "Item A",
+        "unit_price_paise": 1000,
         "stock_quantity": 5,
         "low_stock_threshold": 1,
     }
@@ -54,6 +57,7 @@ def test_get_product_by_sku(client: TestClient):
     payload = {
         "sku": "GET-SKU-001",
         "name": "Test Item",
+        "unit_price_paise": 2000,
         "stock_quantity": 20,
         "low_stock_threshold": 5,
     }
@@ -71,8 +75,8 @@ def test_get_nonexistent_product(client: TestClient):
 
 
 def test_list_products(client: TestClient):
-    client.post("/products", json={"sku": "P1", "name": "Prod 1", "stock_quantity": 10})
-    client.post("/products", json={"sku": "P2", "name": "Prod 2", "stock_quantity": 20})
+    client.post("/products", json={"sku": "P1", "name": "Prod 1", "unit_price_paise": 1000, "stock_quantity": 10})
+    client.post("/products", json={"sku": "P2", "name": "Prod 2", "unit_price_paise": 2000, "stock_quantity": 20})
 
     response = client.get("/products?limit=10&offset=0")
     assert response.status_code == 200
@@ -81,10 +85,11 @@ def test_list_products(client: TestClient):
 
 
 def test_update_product(client: TestClient):
-    client.post("/products", json={"sku": "UPDATE-001", "name": "Original Name", "stock_quantity": 10, "low_stock_threshold": 2})
+    client.post("/products", json={"sku": "UPDATE-001", "name": "Original Name", "unit_price_paise": 1000, "stock_quantity": 10, "low_stock_threshold": 2})
 
-    response = client.patch("/products/UPDATE-001", json={"name": "Updated Name", "low_stock_threshold": 5})
+    response = client.patch("/products/UPDATE-001", json={"name": "Updated Name", "unit_price_paise": 1500, "low_stock_threshold": 5})
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "Updated Name"
+    assert data["unit_price_paise"] == 1500
     assert data["low_stock_threshold"] == 5

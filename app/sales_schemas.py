@@ -1,12 +1,12 @@
-﻿from datetime import datetime
-
+from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class SaleCreate(BaseModel):
     sku: str = Field(min_length=1, max_length=64)
     quantity: int = Field(gt=0, le=10000)
-    unit_price_paise: int = Field(ge=0, le=100000000)
+    unit_price_paise: Optional[int] = Field(default=None, ge=0, le=100000000)
 
 
 class SaleResponse(BaseModel):

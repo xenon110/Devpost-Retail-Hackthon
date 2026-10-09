@@ -1,4 +1,4 @@
-﻿from datetime import datetime, timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     CheckConstraint,
@@ -28,6 +28,10 @@ class Product(Base):
             "low_stock_threshold >= 0",
             name="ck_product_threshold_nonnegative",
         ),
+        CheckConstraint(
+            "unit_price_paise >= 0",
+            name="ck_product_price_nonnegative",
+        ),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -35,6 +39,9 @@ class Product(Base):
         String(64), unique=True, index=True, nullable=False
     )
     name: Mapped[str] = mapped_column(String(200), nullable=False)
+    unit_price_paise: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=1000
+    )
     stock_quantity: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0
     )

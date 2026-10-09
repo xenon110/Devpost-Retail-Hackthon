@@ -23,6 +23,7 @@ def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
     product = Product(
         sku=sku_upper,
         name=payload.name,
+        unit_price_paise=payload.unit_price_paise,
         stock_quantity=payload.stock_quantity,
         low_stock_threshold=payload.low_stock_threshold,
     )
@@ -71,6 +72,8 @@ def update_product(
 
     if payload.name is not None:
         product.name = payload.name
+    if payload.unit_price_paise is not None:
+        product.unit_price_paise = payload.unit_price_paise
     if payload.low_stock_threshold is not None:
         product.low_stock_threshold = payload.low_stock_threshold
 

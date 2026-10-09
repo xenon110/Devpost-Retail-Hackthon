@@ -2,10 +2,11 @@ import concurrent.futures
 from fastapi.testclient import TestClient
 
 
-def create_sample_product(client: TestClient, sku: str = "SHOES-101", stock: int = 10) -> dict:
+def create_sample_product(client: TestClient, sku: str = "SHOES-101", stock: int = 10, unit_price_paise: int = 15000) -> dict:
     payload = {
         "sku": sku,
         "name": "Sample Product",
+        "unit_price_paise": unit_price_paise,
         "stock_quantity": stock,
         "low_stock_threshold": 2,
     }
@@ -15,12 +16,11 @@ def create_sample_product(client: TestClient, sku: str = "SHOES-101", stock: int
 
 
 def test_create_sale_success(client: TestClient):
-    create_sample_product(client, "SALE-001", 10)
+    create_sample_product(client, "SALE-001", 10, 15000)
 
     sale_payload = {
         "sku": "SALE-001",
         "quantity": 2,
-        "unit_price_paise": 15000,
     }
     headers = {"Idempotency-Key": "key-sale-001"}
 
@@ -39,7 +39,7 @@ def test_create_sale_success(client: TestClient):
 
 
 def test_sale_idempotency_retry_same_payload(client: TestClient):
-    create_sample_product(client, "RETRY-001", 10)
+    create_sample_product(client, "RETRY-001", 10, 1000)
 
     sale_payload = {
         "sku": "RETRY-001",
@@ -63,7 +63,7 @@ def test_sale_idempotency_retry_same_payload(client: TestClient):
 
 
 def test_sale_idempotency_conflict_different_payload(client: TestClient):
-    create_sample_product(client, "CONFLICT-001", 10)
+    create_sample_product(client, "CONFLICT-001", 10, 1000)
 
     headers = {"Idempotency-Key": "key-conflict-test"}
 
@@ -82,7 +82,7 @@ def test_sale_product_not_found(client: TestClient):
 
 
 def test_sale_insufficient_stock(client: TestClient):
-    create_sample_product(client, "LOWSTOCK-001", 2)
+    create_sample_product(client, "LOWSTOCK-001", 2, 500)
     headers = {"Idempotency-Key": "key-lowstock"}
 
     response = client.post("/sales", json={"sku": "LOWSTOCK-001", "quantity": 5, "unit_price_paise": 500}, headers=headers)
@@ -96,8 +96,8 @@ def test_sale_missing_idempotency_header(client: TestClient):
 
 
 def test_list_and_get_sales(client: TestClient):
-    create_sample_product(client, "LIST-SALE-001", 10)
-    resp = client.post("/sales", json={"sku": "LIST-SALE-001", "quantity": 1, "unit_price_paise": 1000}, headers={"Idempotency-Key": "key-list-1"})
+    create_sample_product(client, "LIST-SALE-001", 10, 1000)
+    resp = client.post("/sales", json={"sku": "LIST-SALE-001", "quantity": 1}, headers={"Idempotency-Key": "key-list-1"})
     sale_id = resp.json()["id"]
 
     list_resp = client.get("/sales")
@@ -110,11 +110,11 @@ def test_list_and_get_sales(client: TestClient):
 
 
 def test_concurrent_sales(client: TestClient):
-    create_sample_product(client, "RACE-001", 5)
+    create_sample_product(client, "RACE-001", 5, 1000)
 
     def attempt_sale(index: int):
         headers = {"Idempotency-Key": f"key-race-{index}"}
-        payload = {"sku": "RACE-001", "quantity": 1, "unit_price_paise": 1000}
+        payload = {"sku": "RACE-001", "quantity": 1}
         return client.post("/sales", json=payload, headers=headers)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:

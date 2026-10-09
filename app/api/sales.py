@@ -25,6 +25,17 @@ def create_sale(
 
     sku = payload.sku.strip().upper()
 
+    product = db.scalar(select(Product).where(Product.sku == sku))
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Authoritative server price lookup if not provided
+    effective_unit_price = (
+        payload.unit_price_paise
+        if payload.unit_price_paise is not None
+        else product.unit_price_paise
+    )
+
     existing = db.scalar(
         select(Sale).where(Sale.idempotency_key == key)
     )
@@ -33,17 +44,13 @@ def create_sale(
         if (
             existing.sku != sku
             or existing.quantity != payload.quantity
-            or existing.unit_price_paise != payload.unit_price_paise
+            or existing.unit_price_paise != effective_unit_price
         ):
             raise HTTPException(
                 status_code=409,
                 detail="Idempotency key was already used for a different request",
             )
         return existing
-
-    product = db.scalar(select(Product).where(Product.sku == sku))
-    if product is None:
-        raise HTTPException(status_code=404, detail="Product not found")
 
     result = db.execute(
         update(Product)
@@ -65,8 +72,8 @@ def create_sale(
         product_id=product.id,
         sku=sku,
         quantity=payload.quantity,
-        unit_price_paise=payload.unit_price_paise,
-        total_paise=payload.quantity * payload.unit_price_paise,
+        unit_price_paise=effective_unit_price,
+        total_paise=payload.quantity * effective_unit_price,
     )
     db.add(sale)
 
@@ -84,7 +91,7 @@ def create_sale(
             if (
                 existing.sku == sku
                 and existing.quantity == payload.quantity
-                and existing.unit_price_paise == payload.unit_price_paise
+                and existing.unit_price_paise == effective_unit_price
             ):
                 return existing
 
