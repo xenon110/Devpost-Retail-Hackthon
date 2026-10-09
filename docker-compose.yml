@@ -1,0 +1,14 @@
+﻿services:
+  retailcore:
+    build: .
+    container_name: retailcore_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - retailcore_data:/app
+    environment:
+      - PORT=8000
+    restart: always
+
+volumes:
+  retailcore_data:
