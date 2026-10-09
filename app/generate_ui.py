@@ -1,0 +1,244 @@
+﻿import pathlib
+
+html_code = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailCore POS — Interactive Cashier & Reconciliation Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f172a; --panel-bg: #1e293b; --panel-border: #334155;
+            --accent-blue: #3b82f6; --accent-blue-hover: #2563eb; --accent-green: #10b981;
+            --accent-green-hover: #059669; --accent-amber: #f59e0b; --accent-red: #ef4444;
+            --accent-purple: #8b5cf6; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --glass-bg: rgba(30, 41, 59, 0.75);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        header { background: var(--glass-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--panel-border); padding: 0.85rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .brand { display: flex; align-items: center; gap: 0.75rem; }
+        .brand-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .brand-title h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; background: linear-gradient(to right, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .brand-title p { font-size: 0.72rem; color: var(--accent-green); font-weight: 500; display: flex; align-items: center; gap: 0.35rem; }
+        .brand-title p::before { content: ''; width: 6px; height: 6px; background-color: var(--accent-green); border-radius: 50%; display: inline-block; box-shadow: 0 0 8px var(--accent-green); }
+        .header-actions { display: flex; align-items: center; gap: 0.75rem; }
+        .btn { padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-hover)); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4); }
+        .btn-secondary { background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--panel-border); }
+        .btn-secondary:hover { background: #273549; border-color: #475569; }
+        .btn-warning { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .btn-warning:hover { background: rgba(245, 158, 11, 0.25); }
+        .btn-success { background: linear-gradient(135deg, var(--accent-green), var(--accent-green-hover)); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .btn-success:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4); }
+        .app-container { display: grid; grid-template-columns: 340px 1fr 380px; gap: 1.25rem; padding: 1.25rem; flex: 1; max-width: 1800px; margin: 0 auto; width: 100%; }
+        @media (max-width: 1280px) { .app-container { grid-template-columns: 1fr; } }
+        .panel { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); }
+        .panel-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.4); }
+        .panel-header h2 { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .panel-body { padding: 1.25rem; flex: 1; overflow-y: auto; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+        .product-card { background: #0f172a; border: 1px solid var(--panel-border); border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease; }
+        .product-card:hover { border-color: var(--accent-blue); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+        .sku-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; width: fit-content; margin-bottom: 0.5rem; }
+        .product-name { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .product-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--panel-border); }
+        .stock-badge { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.6rem; border-radius: 20px; display: flex; align-items: center; gap: 0.3rem; }
+        .stock-normal { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+        .stock-low { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+        .stock-out { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+        .register-box { background: #0f172a; border: 1px solid var(--panel-border); border-radius: 10px; padding: 1rem; margin-bottom: 1rem; }
+        .form-group { margin-bottom: 0.85rem; }
+        .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; }
+        .form-control { width: 100%; padding: 0.65rem 0.85rem; background: #1e293b; border: 1px solid var(--panel-border); border-radius: 8px; color: white; font-size: 0.88rem; outline: none; transition: border-color 0.2s ease; }
+        .form-control:focus { border-color: var(--accent-blue); }
+        .input-group { display: flex; gap: 0.5rem; }
+        .checkout-summary { background: #0f172a; border: 1px solid var(--panel-border); border-radius: 12px; padding: 1.25rem; margin-top: 1rem; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .summary-row.total { font-size: 1.2rem; font-weight: 700; border-top: 1px solid var(--panel-border); padding-top: 0.75rem; margin-top: 0.5rem; color: var(--accent-green); }
+        .feed-list { display: flex; flex-direction: column; gap: 0.75rem; }
+        .feed-item { background: #0f172a; border: 1px solid var(--panel-border); border-radius: 10px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.35rem; animation: fadeIn 0.3s ease; }
+        .feed-header { display: flex; justify-content: space-between; align-items: center; }
+        .badge-status { font-size: 0.7rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .status-201 { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); }
+        .status-409 { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); }
+        .status-404 { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal { background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 16px; width: 90%; max-width: 550px; padding: 1.5rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--panel-border); }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+        .close-btn:hover { color: white; }
+        .receipt-paper { background: #ffffff; color: #1e293b; padding: 1.5rem; border-radius: 8px; font-family: 'JetBrains Mono', monospace; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3); border-top: 5px solid var(--accent-blue); }
+        .receipt-paper h3 { text-align: center; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .receipt-divider { border-top: 1px dashed #cbd5e1; margin: 0.75rem 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-cash-register"></i></div>
+            <div class="brand-title">
+                <h1>RetailCore POS</h1>
+                <p>Track 3 Microservice Online</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-warning" onclick="openStockAlertsModal()"><i class="fa-solid fa-triangle-exclamation"></i> Stock Alerts</button>
+            <button class="btn btn-secondary" onclick="openZReportModal()"><i class="fa-solid fa-chart-line"></i> Daily Z-Report</button>
+            <button class="btn btn-primary" onclick="openAddProductModal()"><i class="fa-solid fa-plus"></i> Add Product</button>
+        </div>
+    </header>
+    <div class="app-container">
+        <div class="panel">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-boxes-stacked"></i> Inventory</h2>
+                <button class="btn btn-secondary" style="padding:0.3rem 0.6rem; font-size:0.75rem;" onclick="loadProducts()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+            <div class="panel-body"><div class="products-grid" id="productsGrid"></div></div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-cart-shopping"></i> Checkout Terminal</h2>
+                <span class="badge-status status-201" id="registerBadge">Register #1 Active</span>
+            </div>
+            <div class="panel-body">
+                <div class="register-box">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-barcode"></i> Select SKU to Purchase</label>
+                        <select class="form-control" id="selectSku" onchange="updateSelectedProduct()"></select>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                        <div class="form-group"><label>Quantity</label><input type="number" class="form-control" id="inputQuantity" value="1" min="1" onchange="calculateTotal()"></div>
+                        <div class="form-group"><label>Unit Price (₹)</label><input type="number" class="form-control" id="inputUnitPrice" value="250.00" step="0.01" readonly></div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-key"></i> Idempotency Key (Network Safety Header)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="inputIdempotencyKey" style="font-family:'JetBrains Mono', monospace;">
+                            <button class="btn btn-secondary" onclick="generateNewKey()"><i class="fa-solid fa-arrows-rotate"></i> New</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkout-summary">
+                    <div class="summary-row"><span>Selected Item</span><strong id="summaryProductName">-</strong></div>
+                    <div class="summary-row"><span>Stock Available</span><strong id="summaryStockCount">-</strong></div>
+                    <div class="summary-row total"><span>Total Payable</span><strong id="summaryTotalAmount">₹0.00</strong></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-top:1.25rem;">
+                        <button class="btn btn-success" style="justify-content:center; padding:0.8rem;" onclick="processSale(false)"><i class="fa-solid fa-credit-card"></i> Complete Sale</button>
+                        <button class="btn btn-warning" style="justify-content:center; padding:0.8rem;" onclick="processSale(true)"><i class="fa-solid fa-repeat"></i> Retry (Idempotent)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header"><h2><i class="fa-solid fa-list-check"></i> Audit Feed</h2></div>
+            <div class="panel-body"><div class="feed-list" id="feedList"><div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:2rem;">No transactions recorded yet.</div></div></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="addProductModal">
+        <div class="modal">
+            <div class="modal-header"><h3>Add New Product</h3><button class="close-btn" onclick="closeModal('addProductModal')">&times;</button></div>
+            <form onsubmit="submitNewProduct(event)">
+                <div class="form-group"><label>Product SKU</label><input type="text" class="form-control" id="newSku" placeholder="e.g. SHOES-202" required></div>
+                <div class="form-group"><label>Product Name</label><input type="text" class="form-control" id="newName" placeholder="e.g. Leather Boots" required></div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
+                    <div class="form-group"><label>Initial Stock</label><input type="number" class="form-control" id="newStock" value="10" min="0" required></div>
+                    <div class="form-group"><label>Low Stock Threshold</label><input type="number" class="form-control" id="newThreshold" value="3" min="0" required></div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.75rem;">Create Product</button>
+            </form>
+        </div>
+    </div>
+    <div class="modal-overlay" id="receiptModal"><div class="modal" style="max-width:420px;"><div class="modal-header"><h3>POS Receipt</h3><button class="close-btn" onclick="closeModal('receiptModal')">&times;</button></div><div class="receipt-paper" id="receiptContent"></div></div></div>
+    <div class="modal-overlay" id="zReportModal"><div class="modal" style="max-width:600px;"><div class="modal-header"><h3>Daily Z-Report</h3><button class="close-btn" onclick="closeModal('zReportModal')">&times;</button></div><div id="zReportContent"></div></div></div>
+    <div class="modal-overlay" id="stockAlertsModal"><div class="modal" style="max-width:600px;"><div class="modal-header"><h3>Stock Alerts</h3><button class="close-btn" onclick="closeModal('stockAlertsModal')">&times;</button></div><div id="stockAlertsContent"></div></div></div>
+    <script>
+        let productsMap = {};
+        document.addEventListener('DOMContentLoaded', () => { generateNewKey(); loadProducts(); });
+        function generateNewKey() { document.getElementById('inputIdempotencyKey').value = 'chk-' + Math.floor(100000 + Math.random() * 900000); }
+        async function loadProducts() {
+            try {
+                const res = await fetch('/products'); const products = await res.json();
+                const grid = document.getElementById('productsGrid'); const select = document.getElementById('selectSku');
+                grid.innerHTML = ''; select.innerHTML = ''; productsMap = {};
+                if (products.length === 0) { grid.innerHTML = '<div style="color:var(--text-muted); grid-column:1/-1; text-align:center; padding:2rem;">No products found.</div>'; return; }
+                products.forEach(p => {
+                    productsMap[p.sku] = p;
+                    let stockClass = p.stock_quantity === 0 ? 'stock-out' : (p.stock_quantity <= p.low_stock_threshold ? 'stock-low' : 'stock-normal');
+                    let stockLabel = p.stock_quantity === 0 ? 'Out of Stock' : (p.stock_quantity <= p.low_stock_threshold ? `${p.stock_quantity} Low Stock` : `${p.stock_quantity} In Stock`);
+                    grid.innerHTML += `<div class="product-card"><div><div class="sku-badge">${p.sku}</div><div class="product-name">${p.name}</div></div><div class="product-meta"><div class="stock-badge ${stockClass}">${stockLabel}</div></div></div>`;
+                    select.innerHTML += `<option value="${p.sku}">${p.sku} — ${p.name} (Stock: ${p.stock_quantity})</option>`;
+                });
+                updateSelectedProduct();
+            } catch(e) { console.error(e); }
+        }
+        function updateSelectedProduct() { const sku = document.getElementById('selectSku').value; if (!sku || !productsMap[sku]) return; const p = productsMap[sku]; document.getElementById('summaryProductName').innerText = p.name; document.getElementById('summaryStockCount').innerText = p.stock_quantity; calculateTotal(); }
+        function calculateTotal() { const qty = parseInt(document.getElementById('inputQuantity').value) || 1; const price = parseFloat(document.getElementById('inputUnitPrice').value) || 250.00; document.getElementById('summaryTotalAmount').innerText = '₹' + (qty * price).toFixed(2); }
+        async function processSale(isRetryDemo) {
+            const sku = document.getElementById('selectSku').value; const quantity = parseInt(document.getElementById('inputQuantity').value);
+            const key = document.getElementById('inputIdempotencyKey').value.trim();
+            if (!sku || !key) return;
+            try {
+                const res = await fetch('/sales', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify({ sku: sku, quantity: quantity, unit_price_paise: 25000 }) });
+                const data = await res.json(); addFeedLog(res.status, key, sku, quantity, data, isRetryDemo); await loadProducts();
+                if ((res.status === 201 || res.status === 200) && !isRetryDemo) generateNewKey();
+            } catch(e) { console.error(e); }
+        }
+        function addFeedLog(status, key, sku, qty, data, isRetryDemo) {
+            const list = document.getElementById('feedList'); if (list.children.length === 1 && list.children[0].innerText.includes('No transactions')) list.innerHTML = '';
+            let statusBadge = '<span class="badge-status status-201">201 SALE SUCCESS</span>'; let msg = `Created Sale #${data.id || ''} | Stock deducted`;
+            if (status === 409) {
+                if (data.detail && data.detail.includes('already used')) { statusBadge = '<span class="badge-status status-409">409 IDEMPOTENT RETRY</span>'; msg = `Key reused! Returned original Sale #${data.id || ''} without double deduction.`; }
+                else { statusBadge = '<span class="badge-status status-404">409 STOCK CONFLICT</span>'; msg = data.detail || 'Insufficient stock'; }
+            } else if (status === 404) { statusBadge = '<span class="badge-status status-404">404 NOT FOUND</span>'; msg = data.detail; }
+            const item = document.createElement('div'); item.className = 'feed-item';
+            item.innerHTML = `<div class="feed-header">${statusBadge}<span style="font-size:0.75rem; color:var(--text-muted);">${new Date().toLocaleTimeString()}</span></div><div style="font-size:0.85rem; font-weight:600;">Key: <code style="color:var(--accent-blue);">${key}</code></div><div style="font-size:0.8rem; color:var(--text-muted);">${msg}</div>${data.id ? `<button class="btn btn-secondary" style="padding:0.25rem 0.5rem; font-size:0.75rem; margin-top:0.35rem; width:fit-content;" onclick="viewReceipt(${data.id})"><i class="fa-solid fa-receipt"></i> View Receipt</button>` : ''}`;
+            list.prepend(item);
+        }
+        async function viewReceipt(saleId) {
+            try {
+                const res = await fetch(`/reports/receipts/${saleId}`); const data = await res.json();
+                document.getElementById('receiptContent').innerHTML = `<h3>RETAILCORE POS</h3><p style="text-align:center; font-size:0.75rem;">Store #001 · Tax Receipt</p><div class="receipt-divider"></div><p><strong>Receipt #:</strong> ${data.receipt_id}</p><p><strong>Date:</strong> ${new Date(data.timestamp).toLocaleString()}</p><p><strong>Key:</strong> ${data.idempotency_key}</p><div class="receipt-divider"></div><div style="display:flex; justify-content:space-between;"><span>${data.item.name}</span><span>x${data.item.quantity}</span></div><div style="display:flex; justify-content:space-between; font-weight:700; margin-top:0.5rem;"><span>TOTAL</span><span>${data.item.total_formatted}</span></div>`;
+                openModal('receiptModal');
+            } catch(e) { console.error(e); }
+        }
+        async function openZReportModal() {
+            try {
+                const res = await fetch('/reports/z-report'); const data = await res.json();
+                document.getElementById('zReportContent').innerHTML = `<div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem; margin-bottom:1rem;"><div style="background:#0f172a; padding:1rem; border-radius:8px;"><div>Transactions</div><strong style="color:var(--accent-blue); font-size:1.2rem;">${data.summary.total_transactions}</strong></div><div style="background:#0f172a; padding:1rem; border-radius:8px;"><div>Items Sold</div><strong style="color:var(--accent-purple); font-size:1.2rem;">${data.summary.total_items_sold}</strong></div><div style="background:#0f172a; padding:1rem; border-radius:8px;"><div>Total Revenue</div><strong style="color:var(--accent-green); font-size:1.2rem;">${data.summary.total_revenue_formatted}</strong></div></div>`;
+                openModal('zReportModal');
+            } catch(e) { console.error(e); }
+        }
+        async function openStockAlertsModal() {
+            try {
+                const res = await fetch('/reports/stock-alerts'); const data = await res.json();
+                document.getElementById('stockAlertsContent').innerHTML = `<div><h4 style="color:var(--accent-red);">Out of Stock (${data.stock_out_count})</h4>${data.stock_out_products.map(p => `<div>${p.sku} - ${p.name}</div>`).join('') || 'None'}</div><div style="margin-top:1rem;"><h4 style="color:var(--accent-amber);">Low Stock (${data.low_stock_count})</h4>${data.low_stock_products.map(p => `<div>${p.sku} - ${p.name} (${p.stock_quantity})</div>`).join('') || 'None'}</div>`;
+                openModal('stockAlertsModal');
+            } catch(e) { console.error(e); }
+        }
+        function openAddProductModal() { openModal('addProductModal'); }
+        async function submitNewProduct(e) {
+            e.preventDefault();
+            const sku = document.getElementById('newSku').value.trim().toUpperCase(); const name = document.getElementById('newName').value.trim();
+            const stock = parseInt(document.getElementById('newStock').value); const threshold = parseInt(document.getElementById('newThreshold').value);
+            try {
+                const res = await fetch('/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sku: sku, name: name, stock_quantity: stock, low_stock_threshold: threshold }) });
+                if (res.status === 201) { closeModal('addProductModal'); await loadProducts(); } else { alert('Failed'); }
+            } catch(e) { console.error(e); }
+        }
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    </script>
+</body>
+</html>"""
+
+pathlib.Path(r"C:\Users\yashs\RetailCore\app\static\index.html").write_text(html_code, encoding="utf-8")
+print("Saved UI HTML successfully!")
