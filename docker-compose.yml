@@ -1,14 +1,22 @@
-﻿services:
+services:
   retailcore:
     build: .
     container_name: retailcore_app
     ports:
       - "8000:8000"
-    volumes:
-      - retailcore_data:/app
     environment:
       - PORT=8000
-    restart: always
+      - DATABASE_URL=sqlite:////app/data/retailcore.db
+      - ENVIRONMENT=production
+    volumes:
+      - retailcore_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
 volumes:
   retailcore_data:

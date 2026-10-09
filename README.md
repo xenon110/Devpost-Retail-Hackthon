@@ -1,4 +1,4 @@
-﻿# RetailCore 🛍️
+# RetailCore 🛍️
 > **Real-Time Retail POS Microservice with Idempotent Checkout, Atomic Stock Control, & Financial Reconciliation**
 > 
 > *Built for The Bounty Sprint Hackathon — Track 3: Real-Time Retail Microservices*
@@ -25,89 +25,71 @@ In fast-paced physical retail environments (such as shoe stores, clothing shops,
 
 **RetailCore** is a high-performance backend microservice engineered to guarantee transaction safety, inventory accuracy, and financial auditability under all network and concurrency conditions.
 
-### Core Architectural Pillars:
-
-1. **Atomic Inventory Decrement:**
-   Executes conditional SQL updates (`WHERE id = ? AND stock_quantity >= ?`) at the database engine level. This guarantees stock can **never** drop below `0`, regardless of how many cash registers attempt concurrent checkouts.
-
-2. **Strict Idempotency Engine:**
-   Every sales transaction requires a unique `Idempotency-Key` HTTP header. 
-   - **Identical Retries:** Returns the original sale response instantly without re-executing inventory deductions or duplicating charges.
-   - **Payload Mismatches:** Detects if an idempotency key is reused with modified items or quantities and returns HTTP `409 Conflict`.
-
-3. **Transaction Rollback & Isolation:**
-   Product updates and sale record insertions execute inside single atomic database transactions. If any step fails, the entire transaction rolls back automatically.
-
-4. **Track 3 Retail Analytics & Reconciliation:**
-   - **Itemized Receipts (`GET /reports/receipts/{sale_id}`):** Generates structured POS receipts with SKU, quantity, unit price, formatted INR currency (`₹250.00`), and receipt serial numbers (`REC-000001`).
-   - **Daily Z-Report Reconciliation (`GET /reports/z-report`):** Reconciles daily transaction counts, total items sold, and total revenue.
-   - **Stock-Out & Low-Stock Alerts (`GET /reports/stock-alerts`):** Real-time monitoring of items at or below low-stock thresholds or completely depleted.
-
 ---
 
-## 🛠️ Technology Stack
+## 🐳 Docker & Containerization Guide
 
-- **Language:** Python 3.14+
-- **Framework:** FastAPI (ASGI async microservice framework)
-- **ORM & DB:** SQLAlchemy 2.0+ (SQLite with thread isolation & WAL mode)
-- **Validation:** Pydantic v2
-- **Testing:** Pytest, HTTPX, ThreadPoolExecutor (10-thread concurrency testing)
-- **Containerization:** Docker & Docker Compose
+### 1. Prerequisites
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (v20.10+)
+- Docker Compose (v2.0+)
 
----
+### 2. Required Environment Variables
+Configuration is managed via environment variables. Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Default parameters:
+- `ENVIRONMENT`: `production` (or `development`)
+- `PORT`: `8000`
+- `DATABASE_URL`: `sqlite:////app/data/retailcore.db`
 
-## 📂 Project Architecture
+### 3. Build & Run Services
+To build the container image and start RetailCore in the background:
+```bash
+docker compose up -d --build
+```
 
-```text
-RetailCore/
-├── app/
-│   ├── api/
-│   │   ├── products.py      # POST /products, GET /products, GET /products/{sku}
-│   │   ├── sales.py         # POST /sales (Atomic stock deduction + Idempotency engine)
-│   │   └── reports.py       # Receipts, Z-Report Reconciliation, Stock-out Alerts
-│   ├── database.py          # SQLAlchemy Engine, Session, SQLite adapters
-│   ├── main.py              # FastAPI application & router registration
-│   ├── models.py            # Product & Sale ORM Models (Check Constraints & UTC timestamps)
-│   ├── schemas.py           # Product Pydantic schemas
-│   └── sales_schemas.py     # Sale Pydantic schemas
-├── tests/
-│   ├── conftest.py          # Isolated SQLite database fixtures with WAL mode
-│   ├── test_products.py     # Product creation & validation tests
-│   ├── test_sales.py        # Idempotency, 10-thread race condition, & inventory tests
-│   └── test_reports.py      # Receipts, Z-Report, & stock alert tests
-├── Dockerfile               # Container definition
-├── docker-compose.yml       # Local multi-container orchestration
-└── requirements.txt         # Dependencies
+### 4. Local Access URLs
+- **Interactive POS Operations Console:** [http://localhost:8000/demo](http://localhost:8000/demo)
+- **OpenAPI / Swagger Documentation:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Liveness Health Check:** [http://localhost:8000/health](http://localhost:8000/health)
+- **Database Readiness Check:** [http://localhost:8000/ready](http://localhost:8000/ready)
+
+### 5. Inspect Logs & Health Status
+```bash
+# View service container status & health check results
+docker compose ps
+
+# Follow live application container logs
+docker compose logs -f retailcore
+```
+
+### 6. Database Volume Persistence
+Database storage is maintained inside a dedicated, persistent named volume (`retailcore_data:/app/data`).
+- Stopping or restarting containers via `docker compose stop` or `docker compose down` **preserves** all saved products and completed sales history.
+- ⚠️ *Note on Data Safety:* Avoid running `docker compose down -v` unless you explicitly intend to purge all persistent database records.
+
+### 7. Stopping Services
+```bash
+docker compose down
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🧪 Comprehensive Automated Test Suite
 
-### 1. Local Setup
-```cmd
-cd C:\Users\yashs\RetailCore
-.venv\Scripts\activate
-python -m uvicorn app.main:app --reload
-```
-Interactive OpenAPI / Swagger Documentation available at:
-👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
-
----
-
-## 🧪 Comprehensive Test Suite
-
-Run the full automated test suite:
+Run the full 19-test automated suite:
 
 ```cmd
-pytest -v
+python -m pytest -v
 ```
 
-### Verified Test Suite (17/17 Passing):
+### Verified Test Suite (19/19 Passing):
 - `test_create_product_success` (HTTP 201)
 - `test_create_product_negative_stock_validation` (HTTP 422)
 - `test_create_duplicate_sku` (HTTP 409)
 - `test_get_product_by_sku` & `test_list_products`
+- `test_update_product` (HTTP 200)
 - `test_create_sale_success` (Stock atomically decrements from 10 to 8)
 - `test_sale_idempotency_retry_same_payload` (Returns original sale; stock remains 8)
 - `test_sale_idempotency_conflict_different_payload` (HTTP 409 Conflict)
@@ -116,14 +98,6 @@ pytest -v
 - `test_get_receipt_success` (Receipt ID `REC-000001`, formatted currency)
 - `test_z_report_reconciliation` (Reconciles transaction count & revenue total)
 - `test_stock_alerts` (Identifies low-stock and stock-out products)
-
----
-
-## 🐳 Docker Containerization
-
-```cmd
-docker-compose up --build
-```
 
 ---
 
