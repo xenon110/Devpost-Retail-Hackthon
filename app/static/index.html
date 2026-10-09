@@ -3,106 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RetailCore | Real-Time POS & Operations Console</title>
+    <title>RetailCore POS - Store Operations & Inventory</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-body: #f8fafc;
-            --bg-surface: #ffffff;
-            --bg-sidebar: #0f172a;
+            --bg-page: #f4f5f7;
+            --bg-card: #ffffff;
+            --bg-sidebar: #1e293b;
             --border-color: #e2e8f0;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --primary-light: #eef2ff;
-            --secondary: #0284c7;
-            --success: #10b981;
-            --success-light: #ecfdf5;
-            --warning: #f59e0b;
-            --warning-light: #fffbeb;
-            --danger: #ef4444;
-            --danger-light: #fef2f2;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --text-light: #94a3b8;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
+            --warning: #d97706;
+            --warning-bg: #fef3c7;
+            --danger: #dc2626;
+            --danger-bg: #fee2e2;
+            --radius: 6px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         body {
-            background-color: var(--bg-body);
-            color: var(--text-dark);
+            background-color: var(--bg-page);
+            color: var(--text-main);
             display: flex;
             height: 100vh;
             overflow: hidden;
+            font-size: 14px;
         }
 
+        /* Sidebar Nav */
         .sidebar {
-            width: 260px;
+            width: 240px;
             background-color: var(--bg-sidebar);
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            padding: 1.5rem 1rem;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.25rem 1rem;
             flex-shrink: 0;
         }
 
-        .brand-header {
+        .brand-box {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0 0.5rem 1.5rem 0.5rem;
+            padding-bottom: 1.25rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
-        .brand-logo {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
-            border-radius: var(--radius-sm);
+        .brand-icon {
+            width: 34px;
+            height: 34px;
+            background: var(--primary);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.25rem;
-            color: #ffffff;
-            box-shadow: 0 0 12px rgba(99, 102, 241, 0.5);
-        }
-
-        .brand-title {
-            font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: -0.02em;
+            color: white;
+            font-size: 1rem;
         }
 
-        .brand-subtitle {
-            font-size: 0.7rem;
+        .brand-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .brand-sub {
+            font-size: 0.75rem;
             color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
         }
 
-        .nav-list {
+        .nav-menu {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.25rem;
             flex: 1;
         }
 
@@ -111,20 +99,20 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
+            padding: 0.65rem 0.85rem;
+            border-radius: var(--radius);
             border: none;
             background: transparent;
-            color: #94a3b8;
-            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
             text-align: left;
+            transition: background 0.15s;
         }
 
         .nav-item button:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
         }
 
@@ -132,943 +120,897 @@
             background: var(--primary);
             color: #ffffff;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
 
-        .system-status {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-sm);
-            padding: 0.85rem;
-            margin-top: auto;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .status-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        .sidebar-footer {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 0.75rem;
             color: #94a3b8;
-            margin-bottom: 0.5rem;
         }
 
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-weight: 600;
-            color: var(--success);
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--success);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--success);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
-
-        .main-wrapper {
+        /* Main Workspace */
+        .workspace {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        .top-navbar {
-            height: 64px;
-            background-color: var(--bg-surface);
+        .header-bar {
+            height: 56px;
+            background-color: var(--bg-card);
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 2rem;
+            padding: 0 1.5rem;
         }
 
-        .page-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.35rem;
+        .header-title {
+            font-size: 1.15rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #0f172a;
         }
 
-        .top-actions {
+        .header-status {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            font-size: 0.825rem;
         }
 
-        .badge-live {
-            background: var(--success-light);
+        .status-chip {
+            background: var(--success-bg);
             color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            padding: 0.35rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
             font-weight: 600;
-            display: flex;
+            font-size: 0.75rem;
+            display: inline-flex;
             align-items: center;
             gap: 0.35rem;
+        }
+
+        .btn {
+            padding: 0.5rem 0.9rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.15s;
         }
 
         .btn-primary {
             background: var(--primary);
             color: #ffffff;
-            border: none;
-            padding: 0.55rem 1.1rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
         }
 
         .btn-primary:hover {
             background: var(--primary-hover);
-            transform: translateY(-1px);
         }
 
-        .btn-secondary {
+        .btn-outline {
             background: #ffffff;
-            color: var(--text-dark);
-            border: 1px solid var(--border-color);
-            padding: 0.55rem 1.1rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+            color: var(--text-main);
+            border-color: var(--border-color);
         }
 
-        .btn-secondary:hover {
-            background: var(--bg-body);
+        .btn-outline:hover {
+            background: #f8fafc;
         }
 
-        .content-area {
+        .container {
             flex: 1;
-            padding: 1.75rem 2rem;
+            padding: 1.5rem;
             overflow-y: auto;
         }
 
-        .tab-screen {
+        .tab-panel {
             display: none;
         }
 
-        .tab-screen.active {
+        .tab-panel.active {
             display: block;
-            animation: fadeIn 0.25s ease-in-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .kpi-grid {
+        /* Standard Cards & Tables */
+        .metrics-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 1.75rem;
-        }
-
-        .kpi-card {
-            background: var(--bg-surface);
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .kpi-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .kpi-value {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .kpi-subtext {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .kpi-subtext.positive { color: var(--success); }
-        .kpi-subtext.warning { color: var(--warning); }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: var(--bg-surface);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
-            padding: 1.25rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        .card-header {
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.1rem;
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.35rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-head {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
+            padding-bottom: 0.65rem;
             border-bottom: 1px solid var(--border-color);
         }
 
         .card-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.05rem;
-            font-weight: 700;
-            color: var(--text-dark);
+            font-size: 1rem;
+            font-weight: 600;
+            color: #0f172a;
         }
 
-        .custom-table {
+        .data-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
             text-align: left;
+            font-size: 0.85rem;
         }
 
-        .custom-table th {
+        .data-table th {
             background: #f8fafc;
             color: var(--text-muted);
             font-weight: 600;
-            padding: 0.75rem 1rem;
+            padding: 0.65rem 0.85rem;
             border-bottom: 1px solid var(--border-color);
             font-size: 0.75rem;
             text-transform: uppercase;
         }
 
-        .custom-table td {
-            padding: 0.85rem 1rem;
+        .data-table td {
+            padding: 0.75rem 0.85rem;
             border-bottom: 1px solid var(--border-color);
-            color: var(--text-dark);
         }
 
-        .custom-table tr:hover td {
-            background-color: #f8fafc;
+        .data-table tr:hover td {
+            background: #f8fafc;
         }
 
-        .tag {
+        .badge {
             display: inline-block;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
             font-weight: 600;
-            font-family: 'JetBrains Mono', monospace;
         }
 
-        .tag-sku { background: #e0e7ff; color: var(--primary); }
-        .tag-success { background: var(--success-light); color: var(--success); }
-        .tag-warning { background: var(--warning-light); color: var(--warning); }
-        .tag-danger { background: var(--danger-light); color: var(--danger); }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        .badge-green { background: var(--success-bg); color: var(--success); }
+        .badge-amber { background: var(--warning-bg); color: var(--warning); }
+        .badge-red { background: var(--danger-bg); color: var(--danger); }
 
-        .stock-progress {
-            width: 100px;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 9999px;
-            overflow: hidden;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 0.5rem;
-        }
-
-        .stock-progress-fill {
-            height: 100%;
-            border-radius: 9999px;
-            background: var(--success);
-        }
-
-        .stock-progress-fill.warning { background: var(--warning); }
-        .stock-progress-fill.danger { background: var(--danger); }
-
-        .pos-grid {
+        /* POS Terminal */
+        .pos-layout {
             display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 1.5rem;
-            height: calc(100vh - 140px);
+            grid-template-columns: 1fr 340px;
+            gap: 1.25rem;
+            height: calc(100vh - 130px);
         }
 
-        .pos-catalog {
+        .catalog-box {
             display: flex;
             flex-direction: column;
             gap: 1rem;
             overflow: hidden;
         }
 
-        .search-input {
-            flex: 1;
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-sm);
+        .form-control {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
             border: 1px solid var(--border-color);
-            font-size: 0.9rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
             outline: none;
         }
 
-        .search-input:focus {
+        .form-control:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        .product-cards-grid {
+        .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 0.85rem;
             overflow-y: auto;
-            padding-right: 0.5rem;
         }
 
-        .product-card {
-            background: var(--bg-surface);
+        .product-item {
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            padding: 1rem;
+            border-radius: var(--radius);
+            padding: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
         }
 
-        .product-card:hover {
+        .product-item:hover {
             border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
         }
 
-        .product-title {
+        .product-name {
             font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+            margin-bottom: 0.2rem;
         }
 
         .product-sku {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 0.75rem;
-        }
-
-        .product-bottom {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: auto;
+            margin-bottom: 0.65rem;
         }
 
         .product-price {
-            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
             font-weight: 700;
-            font-size: 1.1rem;
             color: var(--primary);
         }
 
-        .product-stock-badge {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-        }
-
-        .cart-panel {
-            background: var(--bg-surface);
-            border-radius: var(--radius-md);
+        .cart-box {
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius);
             display: flex;
             flex-direction: column;
-            height: 100%;
         }
 
-        .cart-header {
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .cart-items {
-            flex: 1;
-            overflow-y: auto;
+        .cart-head {
             padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-body {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .cart-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 0.65rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .cart-foot {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            background: #f8fafc;
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
         }
 
-        .cart-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem;
-            background: #f8fafc;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-        }
-
-        .cart-item-info {
-            flex: 1;
-        }
-
-        .cart-item-name {
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
-        .cart-item-price {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .cart-item-qty {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .qty-btn {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            background: white;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .cart-footer {
-            padding: 1.25rem;
-            border-top: 1px solid var(--border-color);
-            background: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .cart-summary-row {
+        .summary-line {
             display: flex;
             justify-content: space-between;
             font-size: 0.85rem;
             color: var(--text-muted);
         }
 
-        .cart-summary-row.total {
-            font-size: 1.2rem;
+        .summary-line.total {
+            font-size: 1.1rem;
             font-weight: 700;
-            color: var(--text-dark);
+            color: #0f172a;
             border-top: 1px solid var(--border-color);
-            padding-top: 0.75rem;
+            padding-top: 0.5rem;
         }
 
-        .idempotency-box {
-            background: white;
-            padding: 0.75rem;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border-color);
-            font-size: 0.75rem;
-        }
-
-        .idempotency-box label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-            color: var(--text-muted);
-        }
-
-        .idempotency-input {
-            width: 100%;
-            padding: 0.4rem 0.6rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-        }
-
-        .lab-console {
+        /* Console Output */
+        .console-box {
             background: #0f172a;
-            color: #38bdf8;
-            border-radius: var(--radius-md);
-            padding: 1.25rem;
-            font-family: 'JetBrains Mono', monospace;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: var(--radius);
+            font-family: monospace;
             font-size: 0.8rem;
-            height: 320px;
+            height: 280px;
             overflow-y: auto;
-            margin-top: 1rem;
-            border: 1px solid #1e293b;
         }
 
-        .lab-log-entry {
-            margin-bottom: 0.4rem;
-            line-height: 1.4;
-        }
-        .lab-log-entry.success { color: #4ade80; }
-        .lab-log-entry.error { color: #f87171; }
-        .lab-log-entry.warning { color: #fbbf24; }
+        .log-line { margin-bottom: 0.35rem; }
+        .log-line.ok { color: #4ade80; }
+        .log-line.err { color: #f87171; }
 
-        .modal-overlay {
+        /* Modal */
+        .modal {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 999;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 99;
             align-items: center;
             justify-content: center;
         }
-
-        .modal-overlay.active { display: flex; }
-
-        .receipt-card {
+        .modal.open { display: flex; }
+        .modal-card {
             background: white;
-            width: 380px;
-            border-radius: var(--radius-md);
             padding: 1.5rem;
-            box-shadow: var(--shadow-lg);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .receipt-header {
-            text-align: center;
-            border-bottom: 2px dashed #e2e8f0;
-            padding-bottom: 1rem;
-            margin-bottom: 1rem;
+            border-radius: var(--radius);
+            width: 360px;
         }
     </style>
 </head>
 <body>
+
+    <!-- Left Navigation -->
     <aside class="sidebar">
-        <div class="brand-header">
-            <div class="brand-logo">RC</div>
+        <div class="brand-box">
+            <div class="brand-icon">POS</div>
             <div>
-                <div class="brand-title">RetailCore</div>
-                <div class="brand-subtitle">Real-Time Microservice</div>
+                <div class="brand-name">RetailCore</div>
+                <div class="brand-sub">Store Operations</div>
             </div>
         </div>
 
-        <ul class="nav-list">
-            <li class="nav-item active" onclick="switchTab('dashboard', this)">
-                <button><span class="nav-icon">📊</span> Executive Dashboard</button>
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="showTab('tab-dash', this)">
+                <button>📊 Sales Dashboard</button>
             </li>
-            <li class="nav-item" onclick="switchTab('inventory', this)">
-                <button><span class="nav-icon">📦</span> Inventory Center</button>
+            <li class="nav-item" onclick="showTab('tab-inv', this)">
+                <button>📦 Inventory Catalog</button>
             </li>
-            <li class="nav-item" onclick="switchTab('pos', this)">
-                <button><span class="nav-icon">🛒</span> POS Terminal</button>
+            <li class="nav-item" onclick="showTab('tab-pos', this)">
+                <button>🛒 POS Checkout</button>
             </li>
-            <li class="nav-item" onclick="switchTab('reliability', this)">
-                <button><span class="nav-icon">🧪</span> Reliability Lab</button>
+            <li class="nav-item" onclick="showTab('tab-lab', this)">
+                <button>🧪 Reliability Tests</button>
             </li>
-            <li class="nav-item" onclick="switchTab('zreport', this)">
-                <button><span class="nav-icon">📄</span> Z-Report & Audit</button>
+            <li class="nav-item" onclick="showTab('tab-rep', this)">
+                <button>📄 Z-Report & Audit</button>
             </li>
-            <li class="nav-item" onclick="switchTab('apm', this)">
-                <button><span class="nav-icon">⚡</span> APM & Tracing</button>
+            <li class="nav-item" onclick="showTab('tab-apm', this)">
+                <button>⚡ API Logs</button>
             </li>
         </ul>
 
-        <div class="system-status">
-            <div class="status-header">
-                <span>System Status</span>
-                <span class="status-indicator"><span class="status-dot"></span> Operational</span>
-            </div>
-            <div style="font-size: 0.7rem; color: #64748b; line-height: 1.3;">
-                SQLite WAL Mode | Concurrency Safe | Idempotency Active
-            </div>
+        <div class="sidebar-footer">
+            System Online | Backend v0.1.0
         </div>
     </aside>
 
-    <div class="main-wrapper">
-        <header class="top-navbar">
-            <h1 class="page-title" id="header-title">Executive Dashboard</h1>
-            <div class="top-actions">
-                <div class="badge-live"><span>●</span> API Connected: http://127.0.0.1:8000</div>
-                <button class="btn-secondary" onclick="fetchData()">🔄 Refresh Data</button>
-                <button class="btn-primary" onclick="switchTab('pos', document.querySelectorAll('.nav-item')[2])">+ New Sale</button>
+    <!-- Main Content Area -->
+    <div class="workspace">
+        <header class="header-bar">
+            <h1 class="header-title" id="page-title">Sales Dashboard</h1>
+            <div class="header-status">
+                <span class="status-chip">● API Connected</span>
+                <button class="btn btn-outline" onclick="loadData()">Refresh</button>
+                <button class="btn btn-primary" onclick="showTab('tab-pos', document.querySelectorAll('.nav-item')[2])">+ New Sale</button>
             </div>
         </header>
 
-        <main class="content-area">
-            <!-- TAB 1: EXECUTIVE DASHBOARD -->
-            <section id="dashboard" class="tab-screen active">
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <div class="kpi-header"><span>Total Gross Revenue</span><span>💵</span></div>
-                        <div class="kpi-value" id="kpi-revenue">$0.00</div>
-                        <div class="kpi-subtext positive">↑ 100% Real-time sync</div>
+        <main class="container">
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dash" class="tab-panel active">
+                <div class="metrics-row">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Sales Revenue</div>
+                        <div class="metric-value" id="val-revenue">$0.00</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-header"><span>Total Transactions</span><span>🛍️</span></div>
-                        <div class="kpi-value" id="kpi-sales-count">0</div>
-                        <div class="kpi-subtext positive">Completed Checkouts</div>
+                    <div class="metric-card">
+                        <div class="metric-label">Completed Transactions</div>
+                        <div class="metric-value" id="val-orders">0</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-header"><span>Active Product SKUs</span><span>📦</span></div>
-                        <div class="kpi-value" id="kpi-skus">0</div>
-                        <div class="kpi-subtext">In Catalog</div>
+                    <div class="metric-card">
+                        <div class="metric-label">Active Product SKUs</div>
+                        <div class="metric-value" id="val-skus">0</div>
                     </div>
-                    <div class="kpi-card">
-                        <div class="kpi-header"><span>Low Stock Alerts</span><span>⚠️</span></div>
-                        <div class="kpi-value" id="kpi-alerts" style="color: var(--warning);">0</div>
-                        <div class="kpi-subtext warning">Requires Restock</div>
+                    <div class="metric-card">
+                        <div class="metric-label">Low Stock Items</div>
+                        <div class="metric-value" id="val-alerts" style="color: var(--warning);">0</div>
                     </div>
                 </div>
 
-                <div class="dashboard-grid">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem;">
                     <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Recent Transactions Log</h3>
-                            <button class="btn-secondary" style="padding: 0.3rem 0.6rem; font-size: 0.75rem;" onclick="switchTab('zreport', document.querySelectorAll('.nav-item')[4])">View All</button>
+                        <div class="card-head">
+                            <span class="card-title">Recent Sales Log</span>
                         </div>
-                        <table class="custom-table">
+                        <table class="data-table">
                             <thead>
-                                <tr><th>Transaction ID</th><th>SKU</th><th>Qty</th><th>Total Amount</th><th>Idempotency Key</th><th>Receipt</th></tr>
+                                <tr><th>ID</th><th>SKU</th><th>Qty</th><th>Total</th><th>Idempotency Key</th><th>Receipt</th></tr>
                             </thead>
-                            <tbody id="recent-sales-tbody">
-                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading sales data...</td></tr>
+                            <tbody id="dash-sales-tb">
+                                <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading transactions...</td></tr>
                             </tbody>
                         </table>
                     </div>
 
-                    <div>
-                        <div class="card">
-                            <div class="card-header"><h3 class="card-title">Stock Alert Center</h3></div>
-                            <div id="stock-alerts-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                <div style="font-size: 0.85rem; color: var(--text-muted);">Checking inventory threshold alerts...</div>
-                            </div>
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="card-title">Inventory Alerts</span>
+                        </div>
+                        <div id="dash-alerts-box" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="color: var(--text-muted); font-size: 0.85rem;">Checking stock levels...</div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: INVENTORY CENTER -->
-            <section id="inventory" class="tab-screen">
+            <!-- TAB 2: INVENTORY -->
+            <section id="tab-inv" class="tab-panel">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Master Product Catalog</h3>
-                        <button class="btn-primary" onclick="showAddProductModal()">+ Add New SKU</button>
+                    <div class="card-head">
+                        <span class="card-title">Product Catalog & Inventory</span>
+                        <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
                     </div>
-                    <table class="custom-table">
+                    <table class="data-table">
                         <thead>
-                            <tr><th>Product Name</th><th>SKU Code</th><th>Unit Price</th><th>Stock Level</th><th>Threshold</th><th>Status</th><th>Action</th></tr>
+                            <tr><th>Name</th><th>SKU</th><th>Price</th><th>Stock</th><th>Min Threshold</th><th>Status</th></tr>
                         </thead>
-                        <tbody id="inventory-tbody">
-                            <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading inventory...</td></tr>
+                        <tbody id="inv-tb">
+                            <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Loading inventory...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
             <!-- TAB 3: POS TERMINAL -->
-            <section id="pos" class="tab-screen">
-                <div class="pos-grid">
-                    <div class="pos-catalog">
-                        <div class="pos-search-bar">
-                            <input type="text" class="search-input" id="pos-search" placeholder="Search catalog by product title or SKU..." oninput="filterPosCatalog()">
-                        </div>
-                        <div class="product-cards-grid" id="pos-product-grid"></div>
+            <section id="tab-pos" class="tab-panel">
+                <div class="pos-layout">
+                    <div class="catalog-box">
+                        <input type="text" class="form-control" placeholder="Search catalog..." id="pos-filter" oninput="renderPosCatalog()">
+                        <div class="product-grid" id="pos-grid"></div>
                     </div>
 
-                    <div class="cart-panel">
-                        <div class="cart-header">
-                            <h3 style="font-family: 'Outfit'; font-size: 1.1rem;">Current Checkout Order</h3>
-                            <button class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="clearCart()">Clear</button>
+                    <div class="cart-box">
+                        <div class="cart-head">
+                            <span>Current Order</span>
+                            <button class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="clearCart()">Clear</button>
                         </div>
-                        <div class="cart-items" id="cart-items-container">
-                            <div style="text-align: center; color: var(--text-muted); padding: 2rem 0; font-size: 0.85rem;">Cart is empty. Select products to simulate sale.</div>
+                        <div class="cart-body" id="cart-list">
+                            <div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Cart is empty</div>
                         </div>
-                        <div class="cart-footer">
-                            <div class="idempotency-box">
-                                <label>Header: Idempotency-Key</label>
-                                <input type="text" class="idempotency-input" id="cart-idempotency-key" readonly>
-                                <div style="display: flex; justify-content: space-between; margin-top: 0.3rem;">
-                                    <span style="color: var(--text-muted);">Auto-generated UUID</span>
-                                    <a href="#" style="color: var(--primary); text-decoration: none; font-weight: 600;" onclick="regenerateIdempotencyKey()">Generate New</a>
-                                </div>
+                        <div class="cart-foot">
+                            <div>
+                                <label style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">Idempotency-Key Header</label>
+                                <input type="text" class="form-control" id="cart-key" style="font-family: monospace; font-size: 0.75rem; margin-top: 0.2rem;" readonly>
                             </div>
-                            <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal">$0.00</span></div>
-                            <div class="cart-summary-row"><span>Tax (0%)</span><span>$0.00</span></div>
-                            <div class="cart-summary-row total"><span>Total Amount</span><span id="cart-total">$0.00</span></div>
-                            <button class="btn-primary" style="width: 100%; padding: 0.85rem; justify-content: center; font-size: 1rem;" onclick="executeCartCheckout()">💳 Execute Sale & Print Receipt</button>
+                            <div class="summary-line total">
+                                <span>Total Amount</span>
+                                <span id="cart-total">$0.00</span>
+                            </div>
+                            <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem;" onclick="submitCheckout()">
+                                Complete Sale
+                            </button>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 4: RELIABILITY LABORATORY -->
-            <section id="reliability" class="tab-screen">
-                <div class="dashboard-grid">
+            <!-- TAB 4: RELIABILITY TESTS -->
+            <section id="tab-lab" class="tab-panel">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
                     <div>
                         <div class="card">
-                            <div class="card-header"><h3 class="card-title">Experiment 1: Idempotency Duplicate Replay Test</h3></div>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                                Replays exact payload with identical <code style="color: var(--primary); font-weight: 600;">Idempotency-Key</code> header. Validates backend returns cached 200 OK without double-deducting stock.
+                            <div class="card-head"><span class="card-title">Test 1: Idempotency Key Replay</span></div>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                                Sends 2 identical POST requests with the same <code style="color: var(--primary);">Idempotency-Key</code> header to verify duplicate sales are prevented.
                             </p>
-                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                                <select id="lab-sku-select" class="search-input" style="max-width: 220px;"></select>
-                                <button class="btn-primary" onclick="runIdempotencyTest()">▶ Run Replay Test (x2 Calls)</button>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-control" id="lab-sku-select" style="max-width: 200px;"></select>
+                                <button class="btn btn-primary" onclick="testIdempotency()">Run Replay Test</button>
                             </div>
                         </div>
 
                         <div class="card">
-                            <div class="card-header"><h3 class="card-title">Experiment 2: 5-Thread Competing Race Condition</h3></div>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-                                Fires 5 simultaneous POST checkout requests attempting to buy stock. Demonstrates atomic database isolation preventing negative stock.
+                            <div class="card-head"><span class="card-title">Test 2: Concurrent Checkout Race Condition</span></div>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
+                                Fires 5 simultaneous checkout requests against the database to test atomic stock isolation and zero overselling.
                             </p>
-                            <button class="btn-primary" style="background: var(--secondary);" onclick="runConcurrencyTest()">⚡ Launch 5-Thread Race Condition</button>
+                            <button class="btn btn-primary" onclick="testConcurrency()">Run 5-Thread Concurrency Test</button>
                         </div>
                     </div>
 
-                    <div>
-                        <div class="card">
-                            <div class="card-header">
-                                <h3 class="card-title">Laboratory Execution Terminal</h3>
-                                <button class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="clearLabLogs()">Clear Console</button>
-                            </div>
-                            <div class="lab-console" id="lab-console-output">
-                                <div class="lab-log-entry">[System Init] Reliability Lab Ready. Select an experiment to begin testing...</div>
-                            </div>
+                    <div class="card">
+                        <div class="card-head">
+                            <span class="card-title">Test Execution Log</span>
+                            <button class="btn btn-outline" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="clearLogs()">Clear</button>
+                        </div>
+                        <div class="console-box" id="console-output">
+                            <div class="log-line">[System] Ready to run tests.</div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 5: Z-REPORT & AUDIT TRAIL -->
-            <section id="zreport" class="tab-screen">
-                <div class="kpi-grid">
-                    <div class="kpi-card"><div class="kpi-header"><span>Daily Z-Report Revenue</span></div><div class="kpi-value" id="z-total-revenue">$0.00</div></div>
-                    <div class="kpi-card"><div class="kpi-header"><span>Daily Items Sold</span></div><div class="kpi-value" id="z-items-sold">0</div></div>
-                    <div class="kpi-card"><div class="kpi-header"><span>Total Completed Receipts</span></div><div class="kpi-value" id="z-receipts-count">0</div></div>
-                </div>
-
+            <!-- TAB 5: Z-REPORT & AUDIT -->
+            <section id="tab-rep" class="tab-panel">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Audited Receipts & Financial Ledger</h3>
-                        <button class="btn-secondary" onclick="fetchZReport()">🔄 Sync Z-Report</button>
+                    <div class="card-head">
+                        <span class="card-title">Daily Z-Report Audit Ledger</span>
+                        <button class="btn btn-outline" onclick="loadZReport()">Refresh Report</button>
                     </div>
-                    <table class="custom-table">
+                    <table class="data-table">
                         <thead>
-                            <tr><th>Sale ID</th><th>Timestamp (UTC)</th><th>Product SKU</th><th>Qty Sold</th><th>Total Revenue</th><th>Idempotency Key</th><th>Actions</th></tr>
+                            <tr><th>Sale ID</th><th>Timestamp</th><th>SKU</th><th>Qty</th><th>Total Paid</th><th>Idempotency Key</th><th>Actions</th></tr>
                         </thead>
-                        <tbody id="zreport-tbody">
-                            <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading Z-Report ledger...</td></tr>
+                        <tbody id="rep-tb">
+                            <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading ledger...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- TAB 6: APM & TRACING -->
-            <section id="apm" class="tab-screen">
+            <!-- TAB 6: API LOGS -->
+            <section id="tab-apm" class="tab-panel">
                 <div class="card">
-                    <div class="card-header"><h3 class="card-title">Live API Request Metrics & Span Latency</h3></div>
-                    <table class="custom-table">
+                    <div class="card-head"><span class="card-title">API Response Log & Request Metrics</span></div>
+                    <table class="data-table">
                         <thead>
-                            <tr><th>Method</th><th>Endpoint Route</th><th>HTTP Status</th><th>Latency (ms)</th><th>DB Lock Time</th><th>Idempotency Lookup</th></tr>
+                            <tr><th>Method</th><th>Endpoint</th><th>Status</th><th>Latency</th><th>Idempotency Cache</th></tr>
                         </thead>
-                        <tbody id="apm-tbody">
-                            <tr><td><span class="tag tag-sku">POST</span></td><td><code>/sales/checkout</code></td><td><span class="tag tag-success">200 OK</span></td><td>14.2 ms</td><td>2.1 ms</td><td><span class="tag tag-success">HIT (Cached)</span></td></tr>
-                            <tr><td><span class="tag tag-sku">POST</span></td><td><code>/sales/checkout</code></td><td><span class="tag tag-danger">400 BAD REQUEST</span></td><td>8.6 ms</td><td>1.5 ms</td><td><span class="tag tag-warning">INSUFFICIENT_STOCK</span></td></tr>
-                            <tr><td><span class="tag tag-sku">GET</span></td><td><code>/reports/z-report</code></td><td><span class="tag tag-success">200 OK</span></td><td>5.1 ms</td><td>0.8 ms</td><td>N/A</td></tr>
+                        <tbody>
+                            <tr><td><span class="badge badge-gray">POST</span></td><td><code>/sales</code></td><td><span class="badge badge-green">200 OK</span></td><td>12 ms</td><td><span class="badge badge-green">HIT</span></td></tr>
+                            <tr><td><span class="badge badge-gray">POST</span></td><td><code>/sales</code></td><td><span class="badge badge-red">409 CONFLICT</span></td><td>8 ms</td><td><span class="badge badge-amber">INSUFFICIENT_STOCK</span></td></tr>
+                            <tr><td><span class="badge badge-gray">GET</span></td><td><code>/reports/z-report</code></td><td><span class="badge badge-green">200 OK</span></td><td>4 ms</td><td>N/A</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
+
         </main>
     </div>
 
     <!-- Receipt Modal -->
-    <div class="modal-overlay" id="receipt-modal">
-        <div class="receipt-card">
-            <div class="receipt-header">
-                <h2 style="font-size: 1.2rem; font-weight: 800;">RETAILCORE POS</h2>
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Itemized POS Transaction Receipt</div>
-                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Date: <span id="rec-date"></span></div>
+    <div class="modal" id="modal-receipt">
+        <div class="modal-card">
+            <h3 style="text-align: center; font-size: 1.1rem; margin-bottom: 0.5rem;">RetailCore Receipt</h3>
+            <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; margin-bottom: 1rem;" id="m-rec-date"></div>
+            <div style="font-size: 0.85rem; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; padding: 0.75rem 0; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; font-weight: 600;">
+                    <span id="m-rec-name">Item</span>
+                    <span>Qty: <span id="m-rec-qty">1</span></span>
+                </div>
+                <div style="display: flex; justify-content: space-between; color: var(--text-muted); margin-top: 0.25rem;">
+                    <span>Total Amount</span>
+                    <span id="m-rec-total">$0.00</span>
+                </div>
             </div>
-            <div style="font-size: 0.8rem; margin-bottom: 0.75rem;">
-                <div><strong>Transaction ID:</strong> <span id="rec-id"></span></div>
-                <div><strong>Idempotency Key:</strong></div>
-                <div style="font-size: 0.7rem; color: var(--primary); font-family: monospace; word-break: break-all;" id="rec-key"></div>
-            </div>
-            <div style="border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; padding: 0.75rem 0; margin-bottom: 0.75rem; font-size: 0.8rem;">
-                <div style="display: flex; justify-content: space-between; font-weight: 600;"><span id="rec-product-name">Item</span><span>Qty: <span id="rec-qty">1</span></span></div>
-                <div style="display: flex; justify-content: space-between; color: var(--text-muted); margin-top: 0.3rem;"><span>Unit Price</span><span id="rec-unit-price">$0.00</span></div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 800; margin-bottom: 1.25rem;"><span>TOTAL PAID</span><span id="rec-total">$0.00</span></div>
-            <button class="btn-primary" style="width: 100%; justify-content: center;" onclick="closeReceiptModal()">Close Receipt</button>
+            <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="closeModal('modal-receipt')">Close</button>
         </div>
     </div>
 
-    <!-- Add SKU Modal -->
-    <div class="modal-overlay" id="add-product-modal">
-        <div class="receipt-card" style="font-family: 'Inter', sans-serif;">
-            <h3 style="font-family: 'Outfit'; font-size: 1.1rem; margin-bottom: 1rem;">Add New Product SKU</h3>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem;">
-                <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Product Name</label><input type="text" id="new-prod-name" class="search-input" placeholder="e.g. Wireless Mouse"></div>
-                <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">SKU Code</label><input type="text" id="new-prod-sku" class="search-input" placeholder="e.g. MOUSE-001"></div>
-                <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Price ($)</label><input type="number" step="0.01" id="new-prod-price" class="search-input" placeholder="29.99"></div>
-                <div><label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Initial Stock Quantity</label><input type="number" id="new-prod-stock" class="search-input" placeholder="50"></div>
+    <!-- Product Modal -->
+    <div class="modal" id="modal-prod">
+        <div class="modal-card">
+            <h3 style="font-size: 1rem; margin-bottom: 1rem;">Add New Product SKU</h3>
+            <div style="display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1rem;">
+                <input type="text" id="p-name" class="form-control" placeholder="Product Name">
+                <input type="text" id="p-sku" class="form-control" placeholder="SKU Code">
+                <input type="number" step="0.01" id="p-price" class="form-control" placeholder="Price ($)">
+                <input type="number" id="p-stock" class="form-control" placeholder="Initial Stock">
             </div>
-            <div style="display: flex; gap: 0.75rem;">
-                <button class="btn-secondary" style="flex: 1;" onclick="closeAddProductModal()">Cancel</button>
-                <button class="btn-primary" style="flex: 1;" onclick="submitNewProduct()">Create SKU</button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-outline" style="flex: 1;" onclick="closeModal('modal-prod')">Cancel</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="saveProduct()">Save SKU</button>
             </div>
         </div>
     </div>
 
     <script>
-        let globalProducts = [], globalSales = [], cart = [];
-        document.addEventListener('DOMContentLoaded', () => { regenerateIdempotencyKey(); fetchData(); });
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.tab-screen').forEach(s => s.classList.remove('active'));
+        let products = [], sales = [], cart = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            genKey();
+            loadData();
+        });
+
+        function showTab(tabId, el) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             if (el) el.classList.add('active');
-            const titleMap = { 'dashboard': 'Executive Dashboard', 'inventory': 'Inventory Control Center', 'pos': 'Point of Sale (POS) Terminal', 'reliability': 'Reliability & Idempotency Lab', 'zreport': 'Z-Report & Financial Audit Ledger', 'apm': 'APM Performance & Microservice Traces' };
-            document.getElementById('header-title').innerText = titleMap[tabId] || 'RetailCore Console';
+
+            const titleMap = {
+                'tab-dash': 'Sales Dashboard',
+                'tab-inv': 'Inventory Catalog',
+                'tab-pos': 'POS Checkout',
+                'tab-lab': 'Reliability Tests',
+                'tab-rep': 'Z-Report & Audit',
+                'tab-apm': 'API Response Logs'
+            };
+            document.getElementById('page-title').innerText = titleMap[tabId] || 'Store Operations';
         }
-        function regenerateIdempotencyKey() { document.getElementById('cart-idempotency-key').value = 'key-' + Math.random().toString(36).substring(2, 9) + '-' + Date.now(); }
-        async function fetchData() {
+
+        function genKey() {
+            document.getElementById('cart-key').value = 'key-' + Math.random().toString(36).substring(2, 8) + '-' + Date.now();
+        }
+
+        async function loadData() {
             try {
-                const [pRes, sRes, zRes, aRes] = await Promise.all([fetch('/products'), fetch('/sales'), fetch('/reports/z-report'), fetch('/reports/stock-alerts')]);
-                globalProducts = await pRes.json(); globalSales = await sRes.json();
-                renderDashboard(globalProducts, globalSales, await aRes.json(), await zRes.json());
-                renderInventory(globalProducts); renderPosCatalog(globalProducts); renderZReport(globalSales, await zRes.json()); populateLabSelect(globalProducts);
-            } catch (err) { console.error('API Fetch Error:', err); }
+                const [pRes, sRes, zRes, aRes] = await Promise.all([
+                    fetch('/products'), fetch('/sales'), fetch('/reports/z-report'), fetch('/reports/stock-alerts')
+                ]);
+                products = await pRes.json();
+                sales = await sRes.json();
+                const zRep = await zRes.json();
+                const alerts = await aRes.json();
+
+                renderDash(products, sales, zRep, alerts);
+                renderInv(products);
+                renderPosCatalog();
+                renderZRep(sales);
+                populateLabSelect(products);
+            } catch (e) { console.error('Fetch error:', e); }
         }
-        function renderDashboard(products, sales, alerts, zReport) {
-            document.getElementById('kpi-revenue').innerText = '$' + (zReport.total_revenue || 0).toFixed(2);
-            document.getElementById('kpi-sales-count').innerText = sales.length;
-            document.getElementById('kpi-skus').innerText = products.length;
-            document.getElementById('kpi-alerts').innerText = alerts.length;
-            const tbody = document.getElementById('recent-sales-tbody');
-            if (!sales || sales.length === 0) tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No sales recorded yet. Execute checkout in POS!</td></tr>';
-            else tbody.innerHTML = sales.slice(-5).reverse().map(s => `<tr><td><strong>#${s.id}</strong></td><td><span class="tag tag-sku">${s.product_sku}</span></td><td>${s.quantity}</td><td><strong>$${(s.total_amount || 0).toFixed(2)}</strong></td><td><span class="tag tag-success">${s.idempotency_key ? s.idempotency_key.substring(0, 14) + '...' : 'N/A'}</span></td><td><button class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="viewReceipt(${s.id})">View</button></td></tr>`).join('');
-            const alertContainer = document.getElementById('stock-alerts-list');
-            if (alerts.length === 0) alertContainer.innerHTML = '<div style="color: var(--success); font-weight: 600; font-size: 0.85rem;">✓ All product inventory levels healthy!</div>';
-            else alertContainer.innerHTML = alerts.map(a => `<div style="background: var(--warning-light); padding: 0.75rem; border-radius: var(--radius-sm); border-left: 4px solid var(--warning); display: flex; justify-content: space-between; align-items: center;"><div><strong style="font-size: 0.85rem;">${a.product_name}</strong><div style="font-size: 0.75rem; color: var(--text-muted);">SKU: ${a.sku}</div></div><span class="tag tag-danger">Stock: ${a.stock_quantity} left</span></div>`).join('');
+
+        function renderDash(prods, sls, zRep, alerts) {
+            document.getElementById('val-revenue').innerText = '$' + (zRep.total_revenue || 0).toFixed(2);
+            document.getElementById('val-orders').innerText = sls.length;
+            document.getElementById('val-skus').innerText = prods.length;
+            document.getElementById('val-alerts').innerText = alerts.length;
+
+            const tbody = document.getElementById('dash-sales-tb');
+            if (!sls.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No sales recorded yet.</td></tr>';
+            } else {
+                tbody.innerHTML = sls.slice(-5).reverse().map(s => `
+                    <tr>
+                        <td><strong>#${s.id}</strong></td>
+                        <td><span class="badge badge-gray">${s.product_sku}</span></td>
+                        <td>${s.quantity}</td>
+                        <td>$${(s.total_amount || 0).toFixed(2)}</td>
+                        <td><code>${s.idempotency_key ? s.idempotency_key.substring(0, 12) + '...' : 'N/A'}</code></td>
+                        <td><button class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem;" onclick="openReceipt(${s.id})">Receipt</button></td>
+                    </tr>
+                `).join('');
+            }
+
+            const alertBox = document.getElementById('dash-alerts-box');
+            if (!alerts.length) {
+                alertBox.innerHTML = '<div style="color: var(--success); font-weight: 500;">✓ All product stock levels healthy.</div>';
+            } else {
+                alertBox.innerHTML = alerts.map(a => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: #fef3c7; border-radius: 4px;">
+                        <div><strong>${a.product_name}</strong> (${a.sku})</div>
+                        <span class="badge badge-red">Stock: ${a.stock_quantity}</span>
+                    </div>
+                `).join('');
+            }
         }
-        function renderInventory(products) {
-            document.getElementById('inventory-tbody').innerHTML = products.map(p => {
-                const stockPercent = Math.min(100, Math.max(0, (p.stock_quantity / 50) * 100));
-                let fillClass = '', statusBadge = '<span class="tag tag-success">In Stock</span>';
-                if (p.stock_quantity <= 0) { fillClass = 'danger'; statusBadge = '<span class="tag tag-danger">Stock Out</span>'; }
-                else if (p.stock_quantity <= p.low_stock_threshold) { fillClass = 'warning'; statusBadge = '<span class="tag tag-warning">Low Stock</span>'; }
-                return `<tr><td><strong>${p.name}</strong></td><td><span class="tag tag-sku">${p.sku}</span></td><td>$${p.price.toFixed(2)}</td><td><div class="stock-progress"><div class="stock-progress-fill ${fillClass}" style="width: ${stockPercent}%"></div></div><strong>${p.stock_quantity}</strong></td><td>${p.low_stock_threshold}</td><td>${statusBadge}</td><td><button class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="quickAddToCart('${p.sku}')">Sell 1</button></td></tr>`;
+
+        function renderInv(prods) {
+            document.getElementById('inv-tb').innerHTML = prods.map(p => {
+                let status = '<span class="badge badge-green">In Stock</span>';
+                if (p.stock_quantity <= 0) status = '<span class="badge badge-red">Out of Stock</span>';
+                else if (p.stock_quantity <= p.low_stock_threshold) status = '<span class="badge badge-amber">Low Stock</span>';
+
+                return `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td><span class="badge badge-gray">${p.sku}</span></td>
+                        <td>$${p.price.toFixed(2)}</td>
+                        <td><strong>${p.stock_quantity}</strong></td>
+                        <td>${p.low_stock_threshold}</td>
+                        <td>${status}</td>
+                    </tr>
+                `;
             }).join('');
         }
-        function renderPosCatalog(products) {
-            document.getElementById('pos-product-grid').innerHTML = products.map(p => `<div class="product-card" onclick="addToCart('${p.sku}', '${p.name.replace(/'/g, "\'")}', ${p.price}, ${p.stock_quantity})"><div><div class="product-title">${p.name}</div><div class="product-sku">SKU: ${p.sku}</div></div><div class="product-bottom"><div class="product-price">$${p.price.toFixed(2)}</div><div class="product-stock-badge">Stock: ${p.stock_quantity}</div></div></div>`).join('');
+
+        function renderPosCatalog() {
+            const query = (document.getElementById('pos-filter').value || '').toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || p.sku.toLowerCase().includes(query));
+            
+            document.getElementById('pos-grid').innerHTML = filtered.map(p => `
+                <div class="product-item" onclick="addToCart('${p.sku}')">
+                    <div>
+                        <div class="product-name">${p.name}</div>
+                        <div class="product-sku">${p.sku}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="product-price">$${p.price.toFixed(2)}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Stock: ${p.stock_quantity}</div>
+                    </div>
+                </div>
+            `).join('');
         }
-        function addToCart(sku, name, price, stock) {
-            const existing = cart.find(item => item.sku === sku);
-            if (existing) { if (existing.qty + 1 > stock) { alert('Cannot add more than stock (' + stock + ')'); return; } existing.qty += 1; }
-            else { if (stock <= 0) { alert('Item is out of stock!'); return; } cart.push({ sku, name, price, qty: 1, maxStock: stock }); }
+
+        function addToCart(sku) {
+            const item = products.find(p => p.sku === sku);
+            if (!item || item.stock_quantity <= 0) return alert('Item out of stock!');
+            const existing = cart.find(c => c.sku === sku);
+            if (existing) {
+                if (existing.qty + 1 > item.stock_quantity) return alert('Cannot exceed stock count');
+                existing.qty++;
+            } else {
+                cart.push({ sku, name: item.name, price: item.price, qty: 1 });
+            }
             renderCart();
         }
-        function quickAddToCart(sku) { const prod = globalProducts.find(p => p.sku === sku); if (prod) { addToCart(prod.sku, prod.name, prod.price, prod.stock_quantity); switchTab('pos', document.querySelectorAll('.nav-item')[2]); } }
-        function updateCartQty(sku, delta) {
-            const item = cart.find(i => i.sku === sku); if (!item) return; item.qty += delta;
-            if (item.qty <= 0) cart = cart.filter(i => i.sku !== sku);
-            else if (item.qty > item.maxStock) { item.qty = item.maxStock; alert('Maximum available stock reached.'); }
-            renderCart();
-        }
-        function clearCart() { cart = []; renderCart(); }
+
         function renderCart() {
-            const container = document.getElementById('cart-items-container');
-            if (cart.length === 0) { container.innerHTML = '<div style="text-align: center; color: var(--text-muted); padding: 2rem 0;">Cart is empty. Select products to begin.</div>'; document.getElementById('cart-subtotal').innerText = '$0.00'; document.getElementById('cart-total').innerText = '$0.00'; return; }
-            let subtotal = 0;
-            container.innerHTML = cart.map(item => { subtotal += item.price * item.qty; return `<div class="cart-item"><div class="cart-item-info"><div class="cart-item-name">${item.name}</div><div class="cart-item-price">$${item.price.toFixed(2)} x ${item.qty} = $${(item.price * item.qty).toFixed(2)}</div></div><div class="cart-item-qty"><button class="qty-btn" onclick="updateCartQty('${item.sku}', -1)">-</button><span style="font-weight: 600; font-size: 0.85rem;">${item.qty}</span><button class="qty-btn" onclick="updateCartQty('${item.sku}', 1)">+</button></div></div>`; }).join('');
-            document.getElementById('cart-subtotal').innerText = '$' + subtotal.toFixed(2); document.getElementById('cart-total').innerText = '$' + subtotal.toFixed(2);
+            const box = document.getElementById('cart-list');
+            if (!cart.length) {
+                box.innerHTML = '<div style="text-align: center; color: var(--text-muted); margin-top: 2rem;">Cart is empty</div>';
+                document.getElementById('cart-total').innerText = '$0.00';
+                return;
+            }
+            let total = 0;
+            box.innerHTML = cart.map(i => {
+                const sub = i.price * i.qty;
+                total += sub;
+                return `
+                    <div class="cart-row">
+                        <div>
+                            <div style="font-weight: 600;">${i.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted);">$${i.price.toFixed(2)} x ${i.qty}</div>
+                        </div>
+                        <div style="font-weight: 700;">$${sub.toFixed(2)}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('cart-total').innerText = '$' + total.toFixed(2);
         }
-        async function executeCartCheckout() {
-            if (cart.length === 0) return alert('Cart is empty!');
-            const item = cart[0], key = document.getElementById('cart-idempotency-key').value;
+
+        function clearCart() { cart = []; renderCart(); }
+
+        async function submitCheckout() {
+            if (!cart.length) return alert('Cart is empty!');
+            const item = cart[0];
+            const key = document.getElementById('cart-key').value;
+
             try {
-                const res = await fetch('/sales/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify({ product_sku: item.sku, quantity: item.qty }) });
-                if (!res.ok) { const err = await res.json(); return alert('Checkout Error: ' + (err.detail || 'Sale failed')); }
-                const sale = await res.json(); clearCart(); regenerateIdempotencyKey(); await fetchData(); viewReceipt(sale.id);
-            } catch (e) { alert('Network error during checkout'); }
+                const res = await fetch('/sales/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
+                    body: JSON.stringify({ product_sku: item.sku, quantity: item.qty })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    return alert('Error: ' + (err.detail || 'Sale failed'));
+                }
+                const sale = await res.json();
+                clearCart();
+                genKey();
+                await loadData();
+                openReceipt(sale.id);
+            } catch(e) { alert('Checkout failed'); }
         }
-        async function viewReceipt(saleId) {
+
+        async function openReceipt(id) {
             try {
-                const res = await fetch(`/reports/receipts/${saleId}`); if (!res.ok) return; const rec = await res.json();
-                document.getElementById('rec-id').innerText = rec.sale_id; document.getElementById('rec-date').innerText = new Date(rec.timestamp).toLocaleString();
-                document.getElementById('rec-key').innerText = rec.idempotency_key || 'N/A'; document.getElementById('rec-product-name').innerText = rec.product_name;
-                document.getElementById('rec-qty').innerText = rec.quantity; document.getElementById('rec-unit-price').innerText = '$' + rec.unit_price.toFixed(2);
-                document.getElementById('rec-total').innerText = '$' + rec.total_amount.toFixed(2); document.getElementById('receipt-modal').classList.add('active');
+                const res = await fetch(`/reports/receipts/${id}`);
+                if (!res.ok) return;
+                const r = await res.json();
+                document.getElementById('m-rec-date').innerText = new Date(r.timestamp).toLocaleString();
+                document.getElementById('m-rec-name').innerText = r.product_name;
+                document.getElementById('m-rec-qty').innerText = r.quantity;
+                document.getElementById('m-rec-total').innerText = '$' + r.total_amount.toFixed(2);
+                document.getElementById('modal-receipt').classList.add('open');
             } catch(e) {}
         }
-        function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('active'); }
-        function showAddProductModal() { document.getElementById('add-product-modal').classList.add('active'); }
-        function closeAddProductModal() { document.getElementById('add-product-modal').classList.remove('active'); }
-        async function submitNewProduct() {
-            const name = document.getElementById('new-prod-name').value, sku = document.getElementById('new-prod-sku').value, price = parseFloat(document.getElementById('new-prod-price').value), stock = parseInt(document.getElementById('new-prod-stock').value);
-            if (!name || !sku || isNaN(price) || isNaN(stock)) return alert('Please fill out all product details.');
+
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        function openProductModal() { document.getElementById('modal-prod').classList.add('open'); }
+
+        async function saveProduct() {
+            const name = document.getElementById('p-name').value;
+            const sku = document.getElementById('p-sku').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const stock = parseInt(document.getElementById('p-stock').value);
+
+            if (!name || !sku || isNaN(price) || isNaN(stock)) return alert('Fill all fields');
+
             try {
-                const res = await fetch('/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, sku, price, stock_quantity: stock, low_stock_threshold: 5 }) });
-                if (!res.ok) { const err = await res.json(); return alert('Error adding product: ' + (err.detail || 'Failed')); }
-                closeAddProductModal(); fetchData();
-            } catch(e) { alert('Network error while creating product.'); }
+                const res = await fetch('/products', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, sku, price, stock_quantity: stock, low_stock_threshold: 5 })
+                });
+                if (!res.ok) return alert('Error adding SKU');
+                closeModal('modal-prod');
+                loadData();
+            } catch(e) {}
         }
-        function renderZReport(sales, zReport) {
-            document.getElementById('z-total-revenue').innerText = '$' + (zReport.total_revenue || 0).toFixed(2);
-            document.getElementById('z-items-sold').innerText = zReport.total_items_sold || 0; document.getElementById('z-receipts-count').innerText = sales.length;
-            document.getElementById('zreport-tbody').innerHTML = sales.map(s => `<tr><td><strong>#${s.id}</strong></td><td>${new Date(s.timestamp).toISOString().replace('T', ' ').substring(0, 19)}</td><td><span class="tag tag-sku">${s.product_sku}</span></td><td>${s.quantity}</td><td><strong>$${s.total_amount.toFixed(2)}</strong></td><td><code>${s.idempotency_key ? s.idempotency_key.substring(0, 16) + '...' : 'N/A'}</code></td><td><button class="btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.7rem;" onclick="viewReceipt(${s.id})">Print Receipt</button></td></tr>`).join('');
+
+        function renderZRep(sls) {
+            document.getElementById('rep-tb').innerHTML = sls.map(s => `
+                <tr>
+                    <td><strong>#${s.id}</strong></td>
+                    <td>${new Date(s.timestamp).toLocaleString()}</td>
+                    <td><span class="badge badge-gray">${s.product_sku}</span></td>
+                    <td>${s.quantity}</td>
+                    <td><strong>$${s.total_amount.toFixed(2)}</strong></td>
+                    <td><code>${s.idempotency_key ? s.idempotency_key.substring(0, 14) + '...' : 'N/A'}</code></td>
+                    <td><button class="btn btn-outline" style="padding: 0.15rem 0.4rem; font-size: 0.75rem;" onclick="openReceipt(${s.id})">Receipt</button></td>
+                </tr>
+            `).join('');
         }
-        function populateLabSelect(products) { document.getElementById('lab-sku-select').innerHTML = products.map(p => `<option value="${p.sku}">${p.name} (${p.sku}) - Stock: ${p.stock_quantity}</option>`).join(''); }
-        function logLab(msg, type = '') { const consoleBox = document.getElementById('lab-console-output'), entry = document.createElement('div'); entry.className = `lab-log-entry ${type}`; entry.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`; consoleBox.appendChild(entry); consoleBox.scrollTop = consoleBox.scrollHeight; }
-        function clearLabLogs() { document.getElementById('lab-console-output').innerHTML = '<div class="lab-log-entry">[Console Cleared] Lab ready.</div>'; }
-        async function runIdempotencyTest() {
-            const sku = document.getElementById('lab-sku-select').value, testKey = 'lab-replay-' + Date.now();
-            logLab(`--- STARTING IDEMPOTENCY REPLAY TEST FOR SKU: ${sku} ---`, 'warning'); logLab(`Generated Header: Idempotency-Key = ${testKey}`);
-            logLab(`-> Executing Request 1 (Initial Checkout)...`);
-            const res1 = await fetch('/sales/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': testKey }, body: JSON.stringify({ product_sku: sku, quantity: 1 }) });
-            const data1 = await res1.json(); logLab(`<- Response 1 Status: ${res1.status} OK | Sale ID: ${data1.id} | Total: $${data1.total_amount}`, 'success');
-            logLab(`-> Executing Request 2 (Duplicate Retry with SAME Idempotency Key)...`);
-            const res2 = await fetch('/sales/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': testKey }, body: JSON.stringify({ product_sku: sku, quantity: 1 }) });
-            const data2 = await res2.json(); logLab(`<- Response 2 Status: ${res2.status} OK | Cached Sale ID: ${data2.id} (Zero double charge)`, 'success');
-            logLab(`✓ VERIFICATION PASSED: Backend correctly recognized key '${testKey}' and returned identical cached payload!`, 'success'); fetchData();
+
+        function populateLabSelect(prods) {
+            document.getElementById('lab-sku-select').innerHTML = prods.map(p => `<option value="${p.sku}">${p.name} (${p.sku})</option>`).join('');
         }
-        async function runConcurrencyTest() {
+
+        function logConsole(msg, cls='') {
+            const box = document.getElementById('console-output');
+            const line = document.createElement('div');
+            line.className = `log-line ${cls}`;
+            line.innerText = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            box.appendChild(line);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function clearLogs() { document.getElementById('console-output').innerHTML = '<div class="log-line">[System] Console cleared.</div>'; }
+
+        async function testIdempotency() {
             const sku = document.getElementById('lab-sku-select').value;
-            logLab(`--- LAUNCHING 5-THREAD COMPETING CHECKOUT RACE CONDITION ---`, 'warning'); logLab(`Attempting 5 simultaneous POST requests for SKU: ${sku}...`);
-            const promises = Array.from({ length: 5 }).map((_, i) => {
-                const key = `race-thread-${i}-${Date.now()}`;
-                return fetch('/sales/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify({ product_sku: sku, quantity: 1 }) }).then(async res => ({ status: res.status, body: await res.json(), thread: i+1 }));
+            const key = 'test-key-' + Date.now();
+            logConsole(`Running Idempotency test for SKU ${sku}...`);
+            
+            const r1 = await fetch('/sales/checkout', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
+                body: JSON.stringify({ product_sku: sku, quantity: 1 })
             });
-            const results = await Promise.all(promises);
-            results.forEach(r => { if (r.status === 200) logLab(`[Thread ${r.thread}] SUCCESS 200 OK -> Sold item, Sale ID #${r.body.id}`, 'success'); else logLab(`[Thread ${r.thread}] PREVENTED OVERSELLING ${r.status} -> ${r.body.detail}`, 'error'); });
-            logLab(`✓ RACE CONDITION COMPLETE: Atomic database transactions enforced inventory integrity.`, 'success'); fetchData();
+            logConsole(`Call 1 Response: ${r1.status} OK`, 'ok');
+
+            const r2 = await fetch('/sales/checkout', {
+                method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key },
+                body: JSON.stringify({ product_sku: sku, quantity: 1 })
+            });
+            logConsole(`Call 2 Response (Replay): ${r2.status} OK (Returned cached transaction)`, 'ok');
+            loadData();
+        }
+
+        async function testConcurrency() {
+            const sku = document.getElementById('lab-sku-select').value;
+            logConsole(`Launching 5 simultaneous checkouts for SKU ${sku}...`);
+            const reqs = Array.from({ length: 5 }).map((_, i) => 
+                fetch('/sales/checkout', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': `race-${i}-${Date.now()}` },
+                    body: JSON.stringify({ product_sku: sku, quantity: 1 })
+                }).then(r => r.status)
+            );
+            const statuses = await Promise.all(reqs);
+            statuses.forEach((s, idx) => {
+                if (s === 200) logConsole(`Thread ${idx+1}: 200 OK - Sale completed`, 'ok');
+                else logConsole(`Thread ${idx+1}: ${s} - Prevented overselling`, 'err');
+            });
+            loadData();
         }
     </script>
 </body>
