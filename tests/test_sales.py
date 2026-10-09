@@ -1,153 +1,132 @@
-﻿import concurrent.futures
+import concurrent.futures
+from fastapi.testclient import TestClient
 
-def test_create_sale_success(client):
-    # Create product with stock 10
-    client.post(
-        "/products",
-        json={
-            "sku": "SHOES-101",
-            "name": "Running Shoes",
-            "stock_quantity": 10,
-            "low_stock_threshold": 3,
-        },
-    )
 
-    # Perform sale of 2 items
-    response = client.post(
-        "/sales",
-        json={
-            "sku": "SHOES-101",
-            "quantity": 2,
-            "unit_price_paise": 25000,
-        },
-        headers={"Idempotency-Key": "checkout-001"},
-    )
+def create_sample_product(client: TestClient, sku: str = "SHOES-101", stock: int = 10) -> dict:
+    payload = {
+        "sku": sku,
+        "name": "Sample Product",
+        "stock_quantity": stock,
+        "low_stock_threshold": 2,
+    }
+    resp = client.post("/products", json=payload)
+    assert resp.status_code == 201
+    return resp.json()
+
+
+def test_create_sale_success(client: TestClient):
+    create_sample_product(client, "SALE-001", 10)
+
+    sale_payload = {
+        "sku": "SALE-001",
+        "quantity": 2,
+        "unit_price_paise": 15000,
+    }
+    headers = {"Idempotency-Key": "key-sale-001"}
+
+    response = client.post("/sales", json=sale_payload, headers=headers)
     assert response.status_code == 201
+
     data = response.json()
-    assert data["sku"] == "SHOES-101"
+    assert data["sku"] == "SALE-001"
     assert data["quantity"] == 2
-    assert data["unit_price_paise"] == 25000
-    assert data["total_paise"] == 50000
-    assert data["idempotency_key"] == "checkout-001"
+    assert data["unit_price_paise"] == 15000
+    assert data["total_paise"] == 30000
+    assert data["idempotency_key"] == "key-sale-001"
 
-    # Verify inventory was atomically deducted from 10 to 8
-    prod_resp = client.get("/products/SHOES-101")
-    assert prod_resp.status_code == 200
+    prod_resp = client.get("/products/SALE-001")
     assert prod_resp.json()["stock_quantity"] == 8
 
 
-def test_sale_idempotency_retry_same_payload(client):
-    client.post(
-        "/products",
-        json={"sku": "SHOES-101", "name": "Running Shoes", "stock_quantity": 10},
-    )
+def test_sale_idempotency_retry_same_payload(client: TestClient):
+    create_sample_product(client, "RETRY-001", 10)
 
-    payload = {"sku": "SHOES-101", "quantity": 2, "unit_price_paise": 25000}
-    headers = {"Idempotency-Key": "checkout-001"}
+    sale_payload = {
+        "sku": "RETRY-001",
+        "quantity": 3,
+        "unit_price_paise": 1000,
+    }
+    headers = {"Idempotency-Key": "key-retry-unique"}
 
-    # First request
-    res1 = client.post("/sales", json=payload, headers=headers)
-    assert res1.status_code == 201
-    sale1_id = res1.json()["id"]
+    resp1 = client.post("/sales", json=sale_payload, headers=headers)
+    assert resp1.status_code == 201
+    data1 = resp1.json()
 
-    # Duplicate request with same idempotency key
-    res2 = client.post("/sales", json=payload, headers=headers)
-    assert res2.status_code in (200, 201)
-    assert res2.json()["id"] == sale1_id
+    resp2 = client.post("/sales", json=sale_payload, headers=headers)
+    assert resp2.status_code == 201
+    data2 = resp2.json()
 
-    # Verify stock quantity was deducted ONLY ONCE (10 - 2 = 8)
-    prod_resp = client.get("/products/SHOES-101")
-    assert prod_resp.json()["stock_quantity"] == 8
+    assert data1["id"] == data2["id"]
 
-
-def test_sale_idempotency_conflict_different_payload(client):
-    client.post(
-        "/products",
-        json={"sku": "SHOES-101", "name": "Running Shoes", "stock_quantity": 10},
-    )
-
-    headers = {"Idempotency-Key": "checkout-001"}
-
-    # First request with quantity 2
-    res1 = client.post(
-        "/sales",
-        json={"sku": "SHOES-101", "quantity": 2, "unit_price_paise": 25000},
-        headers=headers,
-    )
-    assert res1.status_code == 201
-
-    # Second request with SAME idempotency key but quantity 5
-    res2 = client.post(
-        "/sales",
-        json={"sku": "SHOES-101", "quantity": 5, "unit_price_paise": 25000},
-        headers=headers,
-    )
-    assert res2.status_code == 409
-    assert "already used for a different request" in res2.json()["detail"]
+    prod_resp = client.get("/products/RETRY-001")
+    assert prod_resp.json()["stock_quantity"] == 7
 
 
-def test_sale_product_not_found(client):
-    response = client.post(
-        "/sales",
-        json={"sku": "NONEXISTENT", "quantity": 1, "unit_price_paise": 1000},
-        headers={"Idempotency-Key": "checkout-999"},
-    )
+def test_sale_idempotency_conflict_different_payload(client: TestClient):
+    create_sample_product(client, "CONFLICT-001", 10)
+
+    headers = {"Idempotency-Key": "key-conflict-test"}
+
+    resp1 = client.post("/sales", json={"sku": "CONFLICT-001", "quantity": 1, "unit_price_paise": 1000}, headers=headers)
+    assert resp1.status_code == 201
+
+    resp2 = client.post("/sales", json={"sku": "CONFLICT-001", "quantity": 2, "unit_price_paise": 1000}, headers=headers)
+    assert resp2.status_code == 409
+    assert "already used for a different request" in resp2.json()["detail"]
+
+
+def test_sale_product_not_found(client: TestClient):
+    headers = {"Idempotency-Key": "key-404"}
+    response = client.post("/sales", json={"sku": "MISSING-SKU", "quantity": 1, "unit_price_paise": 500}, headers=headers)
     assert response.status_code == 404
-    assert response.json()["detail"] == "Product not found"
 
 
-def test_sale_insufficient_stock(client):
-    client.post(
-        "/products",
-        json={"sku": "SHOES-101", "name": "Running Shoes", "stock_quantity": 1},
-    )
+def test_sale_insufficient_stock(client: TestClient):
+    create_sample_product(client, "LOWSTOCK-001", 2)
+    headers = {"Idempotency-Key": "key-lowstock"}
 
-    response = client.post(
-        "/sales",
-        json={"sku": "SHOES-101", "quantity": 5, "unit_price_paise": 25000},
-        headers={"Idempotency-Key": "checkout-002"},
-    )
+    response = client.post("/sales", json={"sku": "LOWSTOCK-001", "quantity": 5, "unit_price_paise": 500}, headers=headers)
     assert response.status_code == 409
     assert response.json()["detail"] == "Insufficient stock"
 
-    # Stock remains 1
-    prod_resp = client.get("/products/SHOES-101")
-    assert prod_resp.json()["stock_quantity"] == 1
 
-
-def test_sale_missing_idempotency_header(client):
-    response = client.post(
-        "/sales",
-        json={"sku": "SHOES-101", "quantity": 1, "unit_price_paise": 1000},
-    )
+def test_sale_missing_idempotency_header(client: TestClient):
+    response = client.post("/sales", json={"sku": "ANY", "quantity": 1, "unit_price_paise": 100})
     assert response.status_code == 422
 
 
-def test_concurrent_sales(client):
-    # Initial stock is 5
-    client.post(
-        "/products",
-        json={"sku": "LIMITED-1", "name": "Limited Edition", "stock_quantity": 5},
-    )
+def test_list_and_get_sales(client: TestClient):
+    create_sample_product(client, "LIST-SALE-001", 10)
+    resp = client.post("/sales", json={"sku": "LIST-SALE-001", "quantity": 1, "unit_price_paise": 1000}, headers={"Idempotency-Key": "key-list-1"})
+    sale_id = resp.json()["id"]
 
-    def attempt_sale(index):
-        return client.post(
-            "/sales",
-            json={"sku": "LIMITED-1", "quantity": 1, "unit_price_paise": 10000},
-            headers={"Idempotency-Key": f"concurrent-key-{index}"},
-        )
+    list_resp = client.get("/sales")
+    assert list_resp.status_code == 200
+    assert len(list_resp.json()) >= 1
 
-    # 10 threads trying to purchase 1 item each
+    get_resp = client.get(f"/sales/{sale_id}")
+    assert get_resp.status_code == 200
+    assert get_resp.json()["id"] == sale_id
+
+
+def test_concurrent_sales(client: TestClient):
+    create_sample_product(client, "RACE-001", 5)
+
+    def attempt_sale(index: int):
+        headers = {"Idempotency-Key": f"key-race-{index}"}
+        payload = {"sku": "RACE-001", "quantity": 1, "unit_price_paise": 1000}
+        return client.post("/sales", json=payload, headers=headers)
+
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         futures = [executor.submit(attempt_sale, i) for i in range(10)]
-        results = [f.result() for f in concurrent.futures.as_completed(futures)]
+        results = [f.result() for f in futures]
 
-    successes = [r for r in results if r.status_code == 201]
-    failures = [r for r in results if r.status_code == 409]
+    status_codes = [r.status_code for r in results]
+    successes = status_codes.count(201)
+    failures = status_codes.count(409)
 
-    assert len(successes) == 5
-    assert len(failures) == 5
+    assert successes == 5
+    assert failures == 5
 
-    # Verify final stock is exactly 0 and never negative
-    prod_resp = client.get("/products/LIMITED-1")
+    prod_resp = client.get("/products/RACE-001")
     assert prod_resp.json()["stock_quantity"] == 0

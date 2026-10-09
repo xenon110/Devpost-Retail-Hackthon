@@ -1,6 +1,5 @@
-
 from datetime import datetime
-
+from typing import Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
@@ -22,6 +21,20 @@ class ProductCreate(BaseModel):
     @classmethod
     def normalize_sku(cls, value: str) -> str:
         return value.upper()
+
+
+class ProductUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=200)
+    low_stock_threshold: Optional[int] = Field(default=None, ge=0)
+
+    @field_validator("name")
+    @classmethod
+    def strip_text(cls, value: Optional[str]) -> Optional[str]:
+        if value is not None:
+            value = value.strip()
+            if not value:
+                raise ValueError("Value cannot be blank")
+        return value
 
 
 class ProductResponse(BaseModel):

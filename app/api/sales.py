@@ -1,5 +1,4 @@
-
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Query
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -12,6 +11,7 @@ router = APIRouter(prefix="/sales", tags=["Sales"])
 
 
 @router.post("", response_model=SaleResponse, status_code=201)
+@router.post("/checkout", response_model=SaleResponse, status_code=201)
 def create_sale(
     payload: SaleCreate,
     idempotency_key: str = Header(
@@ -97,3 +97,21 @@ def create_sale(
             status_code=409,
             detail="Sale conflicted with another transaction; retry safely",
         )
+
+
+@router.get("", response_model=list[SaleResponse])
+def list_sales(
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    db: Session = Depends(get_db),
+):
+    statement = select(Sale).order_by(Sale.id).offset(offset).limit(limit)
+    return list(db.scalars(statement).all())
+
+
+@router.get("/{sale_id}", response_model=SaleResponse)
+def get_sale(sale_id: int, db: Session = Depends(get_db)):
+    sale = db.scalar(select(Sale).where(Sale.id == sale_id))
+    if sale is None:
+        raise HTTPException(status_code=404, detail="Sale not found")
+    return sale

@@ -1,14 +1,16 @@
-﻿from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.api.products import router as products_router
 from app.api.sales import router as sales_router
 from app.api.reports import router as reports_router
-from app.database import Base, engine
+from app.database import Base, engine, get_db
 from app import models
 
 
@@ -44,10 +46,19 @@ def get_demo_ui():
 
 
 @app.get("/")
-def health_check():
+def root():
     return {"status": "healthy", "service": "RetailCore", "demo_ui": "/demo"}
 
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/ready")
+def ready(db: Session = Depends(get_db)):
+    try:
+        db.execute(select(1))
+        return {"status": "ready", "database": "connected"}
+    except Exception as e:
+        return {"status": "unready", "error": str(e)}

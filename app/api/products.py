@@ -1,31 +1,41 @@
-
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Product
-from app.schemas import ProductCreate, ProductResponse
+from app.schemas import ProductCreate, ProductResponse, ProductUpdate
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
 
-@router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ProductResponse, status_code=201)
 def create_product(payload: ProductCreate, db: Session = Depends(get_db)):
-    existing = db.scalar(select(Product).where(Product.sku == payload.sku))
+    sku_upper = payload.sku.strip().upper()
+
+    existing = db.scalar(select(Product).where(Product.sku == sku_upper))
     if existing:
-        raise HTTPException(status_code=409, detail="A product with this SKU already exists")
+        raise HTTPException(
+            status_code=409, detail="A product with this SKU already exists"
+        )
 
-    product = Product(**payload.model_dump())
+    product = Product(
+        sku=sku_upper,
+        name=payload.name,
+        stock_quantity=payload.stock_quantity,
+        low_stock_threshold=payload.low_stock_threshold,
+    )
+
     db.add(product)
-
     try:
         db.commit()
         db.refresh(product)
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=409, detail="A product with this SKU already exists")
+        raise HTTPException(
+            status_code=409, detail="A product with this SKU already exists"
+        )
 
     return product
 
@@ -47,4 +57,23 @@ def get_product(sku: str, db: Session = Depends(get_db)):
     if product is None:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    return product
+
+
+@router.patch("/{sku}", response_model=ProductResponse)
+def update_product(
+    sku: str, payload: ProductUpdate, db: Session = Depends(get_db)
+):
+    product = db.scalar(select(Product).where(Product.sku == sku.upper()))
+
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if payload.name is not None:
+        product.name = payload.name
+    if payload.low_stock_threshold is not None:
+        product.low_stock_threshold = payload.low_stock_threshold
+
+    db.commit()
+    db.refresh(product)
     return product
